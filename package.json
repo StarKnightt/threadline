@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "ingest:fetch": "tsx scripts/fetch.ts",
     "ingest:normalise": "tsx scripts/normalise.ts",
     "ingest:embed": "tsx scripts/embed.ts",

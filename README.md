@@ -127,7 +127,7 @@ FalkorDB details we ran into (documented in `docs/CYPHER.md`): `shortestPath()` 
 
 ## Agent design
 
-- **Investigator:** Vercel AI SDK `generateText` with typed tools on Groq (`openai/gpt-oss-120b`, falling back to `gpt-oss-20b` and `qwen/qwen3.8-27b` when rate limited), temperature 0, at most six steps. The system prompt lists short plans per question type and requires node-key citations.
+- **Investigator:** Vercel AI SDK `generateText` with typed tools on Groq (`openai/gpt-oss-120b`, falling back to `gpt-oss-20b` and `qwen/qwen3.8-27b` when rate limited; for live questions only, OpenAI `gpt-5.6-luna` with reasoning off when every Groq model is capped), temperature 0, at most six steps. The system prompt lists short plans per question type and requires node-key citations.
 - **Tools** return `{rows, refs, edges, cypher, ms}`. `refs` and `edges` drive the 3D highlight and the citations.
 - **Verifier:** deterministic, no LLM. Entry nodes are what the investigation started from. Each citation must be observed in a tool result and reachable within four hops over work relationships.
 - **Handoff:** if any citation is rejected, the Verifier hands the claim back once with the reason, and the Investigator rewrites the answer. Claims, verdicts and the handoff are written to `tl_shared`.
@@ -143,12 +143,14 @@ graph TD
   C[Vercel Cron, daily] -- /api/cron/sync --> F
   F -- typed tools, GRAPH.RO_QUERY as read-only user --> D[(FalkorDB Cloud free, AWS ap-south-1)]
   F -- memory, traces, coordination --> D
-  F -- tool calling --> G[Groq: gpt-oss-120b / 20b, qwen3.8-27b]
+  F -- tool calling --> G[Groq: gpt-oss-120b / 20b, qwen3.8-27b<br/>live fallback: OpenAI gpt-5.6-luna]
   F -- question embeddings, cached in FalkorDB --> O[OpenAI text-embedding-3-small, 256 dims]
   C -- updated issues and PRs --> GH[GitHub GraphQL]
 ```
 
 **Cost and abuse guards:** 10 live questions per IP per hour and a global daily cap (counters in FalkorDB); recorded showcase runs replay without any LLM call; six tool steps and capped output tokens per answer; question length cap; question embeddings cached in FalkorDB; read-only database user for agent queries; MCP calls capped per hour. The free tier has no TLS, so only public GitHub data and least-privilege credentials travel over that connection.
+
+**Paid fallback (live questions only):** Groq's free daily caps are shared with the evaluation, so when every Groq model is rate limited, a live question continues on OpenAI `gpt-5.6-luna` (reasoning off). Each run is capped at 4 OpenAI calls and 2,000 output tokens per call (the last allowed call must answer), and paid runs are capped at 30 per day and 100 per 30 days across all visitors (atomic counters in FalkorDB). The evaluation, scripts and recorded showcase replays never use it. A real production question answered this way cost about $0.0004 (3 calls, 6,674 input tokens with 3,870 cached, 190 output). The worst case, with every run using all 4 calls at the output cap, is under $0.01 per run, so under $1 a month at the monthly cap. When the paid budget is also used up, the app says so and points to the recorded runs.
 
 ## Setup
 
@@ -205,14 +207,14 @@ Public data only: issues, pull requests, reviews, file paths, releases and docs 
 ## Limitations
 
 - The free FalkorDB tier has no persistence and stops after a day without use. The daily cron keeps it in use, and the graph can be rebuilt from the cached data in about two minutes.
-- Groq's free limits (8,000 tokens per minute per model) mean concurrent live questions can be slowed; the recorded runs always replay.
+- Groq's free limits (8,000 tokens per minute and a daily token cap per model) mean concurrent live questions can be slowed. Past the daily caps, live questions run on the capped OpenAI fallback, then stop until the limits reset; the recorded runs always replay.
 - Expertise is inferred from authored and reviewed PRs, which misses design discussions in other channels.
 - Release attribution falls back to "first release after the merge" when release notes do not list a PR; the source is recorded on each `SHIPPED_IN` edge.
 - `Decision` nodes extracted by an LLM, planned as optional, were not built.
 
 ## AI usage disclosure
 
-The concept, graph model, query catalogue and evaluation method were planned by Prasenjit before the event as notes (allowed by rule 8). During the event, most implementation code was written by an AI coding agent in Cursor (Anthropic Claude) working from that plan under Prasenjit's direction. Every Cypher query was run and checked against the live FalkorDB instance (`pnpm verify:cypher`), and the evaluation's gold answers are computed independently of FalkorDB. At runtime the app uses Groq-hosted open-weight models for the agent and OpenAI embeddings.
+The concept, graph model, query catalogue and evaluation method were planned by Prasenjit before the event as notes (allowed by rule 8). During the event, most implementation code was written by an AI coding agent in Cursor (Anthropic Claude) working from that plan under Prasenjit's direction. Every Cypher query was run and checked against the live FalkorDB instance (`pnpm verify:cypher`), and the evaluation's gold answers are computed independently of FalkorDB. At runtime the app uses Groq-hosted open-weight models for the agent (with a capped OpenAI fallback for live questions) and OpenAI embeddings.
 
 ## License
 
