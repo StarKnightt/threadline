@@ -254,7 +254,7 @@ function Rig({ focus, idle }: { focus: THREE.Sphere | null; idle: boolean }) {
     const sig = focus ? `${focus.center.x.toFixed(0)},${focus.center.y.toFixed(0)},${focus.center.z.toFixed(0)},${focus.radius.toFixed(0)}` : "all";
     if (sig === lastFocus.current) return;
     lastFocus.current = sig;
-    if (focus) c.fitToSphere(new THREE.Sphere(focus.center, Math.max(focus.radius * 1.2, 70)), true);
+    if (focus) c.fitToSphere(new THREE.Sphere(focus.center, Math.max(focus.radius * 1.2, 55)), true);
     else c.setLookAt(0, 160, 720, 0, 0, 0, true);
   }, [focus]);
   useFrame((_, dt) => {
