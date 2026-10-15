@@ -152,6 +152,7 @@ Requirements: Node 20+, pnpm, a FalkorDB instance, a Groq API key, an OpenAI API
    pnpm layout                  # 3D constellation positions, stored on the nodes
    pnpm verify:cypher           # runs every catalogue query against your graph
    ```
+   Shortcut without GitHub or OpenAI calls: `pnpm seed` downloads the published [graph snapshot](https://github.com/StarKnightt/threadline/releases/tag/snapshot-2026-10-15), then run `pnpm ingest:load --reset && pnpm layout`.
 4. **Run:** `pnpm dev`, then open http://localhost:3000. `pnpm ask "your question"` runs the agent in the terminal.
 5. **Record showcase runs** (optional): `pnpm showcase`.
 6. **Deploy:** import the repo in Vercel, add the variables from `.env.example`, and set the function region next to your FalkorDB instance (`vercel.json` uses `bom1` for AWS ap-south-1). The cron in `vercel.json` calls `/api/cron/sync` daily with `CRON_SECRET`.
