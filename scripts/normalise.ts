@@ -203,12 +203,12 @@ for (const r of raw) {
       edge("AUTHORED", author, key, { at: createdAt });
       props.author = t.author.login;
     }
-    for (const l of t.labels?.nodes ?? []) {
+    for (const l of (t.labels?.nodes ?? []).filter(Boolean)) {
       const lk = `label:${full}:${l.name}`;
       node(lk, "Entity:Label", { name: l.name, color: l.color, repo: full });
       edge("HAS_LABEL", key, lk);
     }
-    for (const a of t.assignees?.nodes ?? []) {
+    for (const a of (t.assignees?.nodes ?? []).filter(Boolean)) {
       const pk = person(a, null);
       if (pk) edge("ASSIGNED_TO", key, pk);
     }
@@ -218,7 +218,7 @@ for (const r of raw) {
     let ci = 0;
     if (!isBotThread && body) ci = addChunks(key, "Thread", "body", `${t.title}. ${body}`, 0, createdAt, full);
     else if (!isBotThread) ci = addChunks(key, "Thread", "body", `${t.title}. ${t.title}`.padEnd(90, " "), 0, createdAt, full);
-    for (const c of t.comments?.nodes ?? []) {
+    for (const c of (t.comments?.nodes ?? []).filter(Boolean)) {
       const at = ts(c.createdAt);
       const pk = person(c.author, at);
       if (!pk) continue;
@@ -239,7 +239,7 @@ for (const r of raw) {
     for (const cid of conceptsIn(allText)) edge("MENTIONS", key, `concept:${cid}`);
 
     // References: timeline cross-references (source -> this), plus #N in the body (this -> target).
-    for (const ev of t.timelineItems?.nodes ?? []) {
+    for (const ev of (t.timelineItems?.nodes ?? []).filter(Boolean)) {
       if (ev.__typename === "CrossReferencedEvent" && ev.source?.number) {
         const src = threadKeyByRef.get(refKey(ev.source.repository.nameWithOwner, ev.source.number));
         if (src && src !== key) edge("REFERENCES", src, key, { at: ts(ev.createdAt), crossRepo: ev.source.repository.nameWithOwner.toLowerCase() !== full.toLowerCase(), source: "timeline" });
@@ -257,7 +257,7 @@ for (const r of raw) {
     }
 
     if (kind === "pr") {
-      for (const ref of t.closingIssuesReferences?.nodes ?? []) {
+      for (const ref of (t.closingIssuesReferences?.nodes ?? []).filter(Boolean)) {
         const ik = threadKeyByRef.get(refKey(ref.repository.nameWithOwner, ref.number));
         if (ik?.startsWith("issue:")) edge("CLOSES", key, ik, { source: "closingReference" });
       }
@@ -266,7 +266,7 @@ for (const r of raw) {
           if (ik.startsWith("issue:") && !edges.has(`CLOSES|${key}|${ik}`)) edge("CLOSES", key, ik, { source: "keyword" });
         }
       }
-      for (const rv of t.reviews?.nodes ?? []) {
+      for (const rv of (t.reviews?.nodes ?? []).filter(Boolean)) {
         const at = ts(rv.submittedAt);
         const pk = person(rv.author, at);
         if (!pk || pk === author) continue;
@@ -280,7 +280,7 @@ for (const r of raw) {
         const pk = person(t.mergedBy, ts(t.mergedAt));
         if (pk) edge("MERGED", pk, key, { at: ts(t.mergedAt) });
       }
-      for (const f of t.files?.nodes ?? []) {
+      for (const f of (t.files?.nodes ?? []).filter(Boolean)) {
         const fk = `file:${full}:${f.path}`;
         const ext = f.path.includes(".") ? f.path.split(".").pop()!.toLowerCase() : "";
         node(fk, "Entity:File", { path: f.path, ext, repo: full, name: f.path.split("/").pop() });

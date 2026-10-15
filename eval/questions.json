@@ -1,0 +1,867 @@
+{
+  "generatedAt": "2026-10-15T06:13:29.018Z",
+  "since": "2023-01-01",
+  "questions": [
+    {
+      "question": "Who opened pull request #152 in the falkordb-browser repository, and what was it about?",
+      "gold": [
+        "anchel123"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/falkordb-browser#152",
+        "person:Anchel123"
+      ],
+      "detail": "fix #14 add monitor view",
+      "id": "lookup-01",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #2628 in the FalkorDB repository, and what was it about?",
+      "gold": [
+        "aviavni"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/FalkorDB#2628",
+        "person:AviAvni"
+      ],
+      "detail": "perf(runtime): evaluate whole expression trees column at a time",
+      "id": "lookup-02",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #9 in the falkordb-ts repository, and what was it about?",
+      "gold": [
+        "gkorland"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/falkordb-ts#9",
+        "person:gkorland"
+      ],
+      "detail": "fix #5 add support for GRAPN.CONSTRAINT",
+      "id": "lookup-03",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #176 in the GraphRAG-SDK repository, and what was it about?",
+      "gold": [
+        "aryan757"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/GraphRAG-SDK#176",
+        "person:aryan757"
+      ],
+      "detail": "feat: Add CreateOntologyStep import to ontology.py",
+      "id": "lookup-04",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #53 in the FalkorDB-MCPServer repository, and what was it about?",
+      "gold": [
+        "gkorland"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/FalkorDB-MCPServer#53",
+        "person:gkorland"
+      ],
+      "detail": "Configure Dependabot for npm and GitHub Actions",
+      "id": "lookup-05",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #107 in the QueryWeaver repository, and what was it about?",
+      "gold": [
+        "gkorland"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/QueryWeaver#107",
+        "person:gkorland"
+      ],
+      "detail": "Design",
+      "id": "lookup-06",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #2042 in the falkordb-browser repository, and what was it about?",
+      "gold": [
+        "anchel123"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/falkordb-browser#2042",
+        "person:Anchel123"
+      ],
+      "detail": "fix: address AI review findings on relationship styling",
+      "id": "lookup-07",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #2845 in the FalkorDB repository, and what was it about?",
+      "gold": [
+        "aviavni"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/FalkorDB#2845",
+        "person:AviAvni"
+      ],
+      "detail": "fix: give every CALL {} body its entry projection as a record boundary",
+      "id": "lookup-08",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #736 in the QueryWeaver repository, and what was it about?",
+      "gold": [
+        "anchel123"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/QueryWeaver#736",
+        "person:Anchel123"
+      ],
+      "detail": "feat: verify email addresses before creating an account",
+      "id": "lookup-09",
+      "category": "lookup"
+    },
+    {
+      "question": "Who opened pull request #3094 in the FalkorDB repository, and what was it about?",
+      "gold": [
+        "aviavni"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/FalkorDB#3094",
+        "person:AviAvni"
+      ],
+      "detail": "fix: validate index OPTIONS like C (vector dimension/similarityFunction required, case-insensitive metric, unknown fulltext keys rejected)",
+      "id": "lookup-10",
+      "category": "lookup"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under src/execution_plan/ops/ in the FalkorDB repository? Name the top three.",
+      "gold": [
+        "swilly22",
+        "aviavni",
+        "gomezgab"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/FalkorDB:src/execution_plan/ops",
+        "person:swilly22",
+        "person:AviAvni",
+        "person:GomezGab"
+      ],
+      "detail": "FalkorDB:src/execution_plan/ops swilly22=63, AviAvni=20, GomezGab=5",
+      "id": "expertise-01",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under src/index/ in the FalkorDB repository? Name the top three.",
+      "gold": [
+        "swilly22",
+        "gomezgab",
+        "aviavni"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/FalkorDB:src/index",
+        "person:swilly22",
+        "person:GomezGab",
+        "person:AviAvni"
+      ],
+      "detail": "FalkorDB:src/index swilly22=17, GomezGab=4, AviAvni=3",
+      "id": "expertise-02",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under e2e/infra/ in the QueryWeaver repository? Name the top three.",
+      "gold": [
+        "naseem77",
+        "gkorland",
+        "anchel123"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/QueryWeaver:e2e/infra",
+        "person:Naseem77",
+        "person:gkorland",
+        "person:Anchel123"
+      ],
+      "detail": "QueryWeaver:e2e/infra Naseem77=3, gkorland=3, Anchel123=3",
+      "id": "expertise-03",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under graph/src/ in the FalkorDB repository? Name the top three.",
+      "gold": [
+        "aviavni",
+        "dvirdukhan",
+        "gkorland"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/FalkorDB:graph/src",
+        "person:AviAvni",
+        "person:DvirDukhan",
+        "person:gkorland"
+      ],
+      "detail": "FalkorDB:graph/src AviAvni=63, DvirDukhan=20, gkorland=5",
+      "id": "expertise-04",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under app/components/ in the falkordb-browser repository? Name the top three.",
+      "gold": [
+        "anchel123",
+        "naseem77",
+        "barakb"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/falkordb-browser:app/components",
+        "person:Anchel123",
+        "person:Naseem77",
+        "person:barakb"
+      ],
+      "detail": "falkordb-browser:app/components Anchel123=314, Naseem77=24, barakb=15",
+      "id": "expertise-05",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under api/ in the QueryWeaver repository? Name the top three.",
+      "gold": [
+        "gkorland",
+        "galshubeli",
+        "naseem77"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/QueryWeaver:api",
+        "person:gkorland",
+        "person:galshubeli",
+        "person:Naseem77"
+      ],
+      "detail": "QueryWeaver:api gkorland=67, galshubeli=34, Naseem77=12",
+      "id": "expertise-06",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under app/src/ in the QueryWeaver repository? Name the top three.",
+      "gold": [
+        "naseem77",
+        "anchel123",
+        "galshubeli"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/QueryWeaver:app/src",
+        "person:Naseem77",
+        "person:Anchel123",
+        "person:galshubeli"
+      ],
+      "detail": "QueryWeaver:app/src Naseem77=11, Anchel123=7, galshubeli=7",
+      "id": "expertise-07",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under graphrag_sdk/ in the GraphRAG-SDK repository? Name the top three.",
+      "gold": [
+        "galshubeli",
+        "naseem77",
+        "gkorland"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/GraphRAG-SDK:graphrag_sdk",
+        "person:galshubeli",
+        "person:Naseem77",
+        "person:gkorland"
+      ],
+      "detail": "GraphRAG-SDK:graphrag_sdk galshubeli=65, Naseem77=19, gkorland=3",
+      "id": "expertise-08",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under src/ in the falkordb-ts repository? Name the top three.",
+      "gold": [
+        "gkorland",
+        "anchel123",
+        "naseem77"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/falkordb-ts:src",
+        "person:gkorland",
+        "person:Anchel123",
+        "person:Naseem77"
+      ],
+      "detail": "falkordb-ts:src gkorland=11, Anchel123=6, Naseem77=4",
+      "id": "expertise-09",
+      "category": "expertise"
+    },
+    {
+      "question": "Who has authored the most merged pull requests that touch files under app/api/schema/ in the falkordb-browser repository? Name the top three.",
+      "gold": [
+        "anchel123",
+        "barakb",
+        "naseem77"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/falkordb-browser:app/api/schema",
+        "person:Anchel123",
+        "person:barakb",
+        "person:Naseem77"
+      ],
+      "detail": "falkordb-browser:app/api/schema Anchel123=42, barakb=3, Naseem77=3",
+      "id": "expertise-10",
+      "category": "expertise"
+    },
+    {
+      "question": "Which pull request fixed issue #611 in the FalkorDB repository, and in which release did the fix ship?",
+      "gold": [
+        "#612",
+        "v4.0.7"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB#611",
+        "pr:FalkorDB/FalkorDB#612",
+        "release:FalkorDB/FalkorDB@v4.0.7"
+      ],
+      "detail": "Disable GraphBLAS JIT",
+      "id": "trace-01",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #1199 in the falkordb-browser repository, and in which release did the fix ship?",
+      "gold": [
+        "#1291",
+        "v1.6.3"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-browser#1199",
+        "pr:FalkorDB/falkordb-browser#1291",
+        "release:FalkorDB/falkordb-browser@v1.6.3"
+      ],
+      "detail": "[Browser] Bug: FalkorDB UI breaks, if it tries to render a node with a temporal data type (i.e. datetime)",
+      "id": "trace-02",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #928 in the falkordb-browser repository, and in which release did the fix ship?",
+      "gold": [
+        "#955",
+        "v1.4.0"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-browser#928",
+        "pr:FalkorDB/falkordb-browser#955",
+        "release:FalkorDB/falkordb-browser@v1.4.0"
+      ],
+      "detail": "Fix query",
+      "id": "trace-03",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #109 in the falkordb-browser repository, and in which release did the fix ship?",
+      "gold": [
+        "#114",
+        "v0.2.1"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-browser#109",
+        "pr:FalkorDB/falkordb-browser#114",
+        "release:FalkorDB/falkordb-browser@v0.2.1"
+      ],
+      "detail": "When showing only metadata, it should be picked by default as selected",
+      "id": "trace-04",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #547 in the falkordb-browser repository, and in which release did the fix ship?",
+      "gold": [
+        "#734",
+        "v1.2.2"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-browser#547",
+        "pr:FalkorDB/falkordb-browser#734",
+        "release:FalkorDB/falkordb-browser@v1.2.2"
+      ],
+      "detail": "Implement get graphs in apiCalls in logic layer & api response interface",
+      "id": "trace-05",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #51 in the FalkorDB-MCPServer repository, and in which release did the fix ship?",
+      "gold": [
+        "#52",
+        "v1.2.0"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB-MCPServer#51",
+        "pr:FalkorDB/FalkorDB-MCPServer#52",
+        "release:FalkorDB/FalkorDB-MCPServer@v1.2.0"
+      ],
+      "detail": "Add Docker publish workflow to CI/CD",
+      "id": "trace-06",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #790 in the falkordb-browser repository, and in which release did the fix ship?",
+      "gold": [
+        "#800",
+        "v1.3.0"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-browser#790",
+        "pr:FalkorDB/falkordb-browser#800",
+        "release:FalkorDB/falkordb-browser@v1.3.0"
+      ],
+      "detail": "clicking profile button after selecting a query from history causes error",
+      "id": "trace-07",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #1711 in the falkordb-browser repository, and in which release did the fix ship?",
+      "gold": [
+        "#1712",
+        "v2.0.3"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-browser#1711",
+        "pr:FalkorDB/falkordb-browser#1712",
+        "release:FalkorDB/falkordb-browser@v2.0.3"
+      ],
+      "detail": "[Browser] [Query History] After redesign there are still issues",
+      "id": "trace-08",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #1987 in the FalkorDB repository, and in which release did the fix ship?",
+      "gold": [
+        "#2013",
+        "v4.18.9"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB#1987",
+        "pr:FalkorDB/FalkorDB#2013",
+        "release:FalkorDB/FalkorDB@v4.18.9"
+      ],
+      "detail": "ALL list predicate on a carried variable after WITH may filter out matching rows",
+      "id": "trace-09",
+      "category": "trace"
+    },
+    {
+      "question": "Which pull request fixed issue #176 in the falkordb-browser repository, and in which release did the fix ship?",
+      "gold": [
+        "#177",
+        "v0.4.0"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-browser#176",
+        "pr:FalkorDB/falkordb-browser#177",
+        "release:FalkorDB/falkordb-browser@v0.4.0"
+      ],
+      "detail": "need to re-style",
+      "id": "trace-10",
+      "category": "trace"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #2434 in the FalkorDB repository?",
+      "gold": [
+        "#609"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB#2434"
+      ],
+      "detail": "GRAPH.INFO with no arguments returns an arity error on the Rust engine <- FalkorDB/falkordb-ts#609",
+      "id": "cross_repo-01",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #1179 in the FalkorDB repository?",
+      "gold": [
+        "#1630"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB#1179"
+      ],
+      "detail": "Backtick usage in Cypher query parameters causes incorrect parameter processing <- FalkorDB/falkordb-browser#1630",
+      "id": "cross_repo-02",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #634 in the FalkorDB repository?",
+      "gold": [
+        "#186"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB#634"
+      ],
+      "detail": "Add link to FalkorDB in README <- FalkorDB/falkordb-browser#186",
+      "id": "cross_repo-03",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #687 in the FalkorDB repository?",
+      "gold": [
+        "#1918"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB#687"
+      ],
+      "detail": "Number Wrong <- FalkorDB/falkordb-browser#1918",
+      "id": "cross_repo-04",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #2048 in the FalkorDB repository?",
+      "gold": [
+        "#1802",
+        "#1803"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB#2048"
+      ],
+      "detail": "[crash] importing a dump using a different graph key causes the redis server to crash <- FalkorDB/falkordb-browser#1802, FalkorDB/falkordb-browser#1803",
+      "id": "cross_repo-05",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #1802 in the falkordb-browser repository?",
+      "gold": [
+        "#2078"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-browser#1802"
+      ],
+      "detail": "Browser UI: Import / Restore a graph from an RDB dump (local upload + S3 URL) <- FalkorDB/FalkorDB#2078",
+      "id": "cross_repo-06",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #404 in the falkordb-ts repository?",
+      "gold": [
+        "#2055"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-ts#404"
+      ],
+      "detail": "Support temporal data <- FalkorDB/falkordb-browser#2055",
+      "id": "cross_repo-07",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #128 in the falkordb-ts repository?",
+      "gold": [
+        "#400"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/falkordb-ts#128"
+      ],
+      "detail": "Add support for FalkorDB Cluster <- FalkorDB/falkordb-browser#400",
+      "id": "cross_repo-08",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference issue #482 in the FalkorDB repository?",
+      "gold": [
+        "#1803"
+      ],
+      "goldKeys": [
+        "issue:FalkorDB/FalkorDB#482"
+      ],
+      "detail": "Graph restored from RDB is not shown on Graph.list <- FalkorDB/falkordb-browser#1803",
+      "id": "cross_repo-09",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which issues or pull requests in other FalkorDB repositories reference pull request #688 in the FalkorDB repository?",
+      "gold": [
+        "#1918"
+      ],
+      "goldKeys": [
+        "pr:FalkorDB/FalkorDB#688"
+      ],
+      "detail": "fix tointeger function parsing int64 values <- FalkorDB/falkordb-browser#1918",
+      "id": "cross_repo-10",
+      "category": "cross_repo"
+    },
+    {
+      "question": "Which open pull requests currently touch files under src/serializers/ in the FalkorDB repository?",
+      "gold": [
+        "#1270",
+        "#2321",
+        "#3167",
+        "#3252"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/FalkorDB:src/serializers",
+        "pr:FalkorDB/FalkorDB#1270",
+        "pr:FalkorDB/FalkorDB#2321",
+        "pr:FalkorDB/FalkorDB#3167",
+        "pr:FalkorDB/FalkorDB#3252"
+      ],
+      "detail": "FalkorDB:src/serializers",
+      "id": "impact-01",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under src/index/ in the FalkorDB repository?",
+      "gold": [
+        "#2107",
+        "#2794",
+        "#2805",
+        "#2807"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/FalkorDB:src/index",
+        "pr:FalkorDB/FalkorDB#2107",
+        "pr:FalkorDB/FalkorDB#2794",
+        "pr:FalkorDB/FalkorDB#2805",
+        "pr:FalkorDB/FalkorDB#2807"
+      ],
+      "detail": "FalkorDB:src/index",
+      "id": "impact-02",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under proofs/aeneas_pilot/full/ in the FalkorDB repository?",
+      "gold": [
+        "#3172"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/FalkorDB:proofs/aeneas_pilot/full",
+        "pr:FalkorDB/FalkorDB#3172"
+      ],
+      "detail": "FalkorDB:proofs/aeneas_pilot/full",
+      "id": "impact-03",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under desktop/lib/ in the falkordb-browser repository?",
+      "gold": [
+        "#2146"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/falkordb-browser:desktop/lib",
+        "pr:FalkorDB/falkordb-browser#2146"
+      ],
+      "detail": "falkordb-browser:desktop/lib",
+      "id": "impact-04",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under src/cron/ in the FalkorDB repository?",
+      "gold": [
+        "#1697"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/FalkorDB:src/cron",
+        "pr:FalkorDB/FalkorDB#1697"
+      ],
+      "detail": "FalkorDB:src/cron",
+      "id": "impact-05",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under app/graph/ in the falkordb-browser repository?",
+      "gold": [
+        "#2146"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/falkordb-browser:app/graph",
+        "pr:FalkorDB/falkordb-browser#2146"
+      ],
+      "detail": "falkordb-browser:app/graph",
+      "id": "impact-06",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under deps/FalkorDB-core-rs/ in the FalkorDB repository?",
+      "gold": [
+        "#1162"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/FalkorDB:deps/FalkorDB-core-rs",
+        "pr:FalkorDB/FalkorDB#1162"
+      ],
+      "detail": "FalkorDB:deps/FalkorDB-core-rs",
+      "id": "impact-07",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under app/src/ in the QueryWeaver repository?",
+      "gold": [
+        "#330",
+        "#514",
+        "#538",
+        "#734"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/QueryWeaver:app/src",
+        "pr:FalkorDB/QueryWeaver#330",
+        "pr:FalkorDB/QueryWeaver#514",
+        "pr:FalkorDB/QueryWeaver#538",
+        "pr:FalkorDB/QueryWeaver#734"
+      ],
+      "detail": "QueryWeaver:app/src",
+      "id": "impact-08",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under app/ts/modules/ in the QueryWeaver repository?",
+      "gold": [
+        "#272"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/QueryWeaver:app/ts/modules",
+        "pr:FalkorDB/QueryWeaver#272"
+      ],
+      "detail": "QueryWeaver:app/ts/modules",
+      "id": "impact-09",
+      "category": "impact"
+    },
+    {
+      "question": "Which open pull requests currently touch files under e2e/tests/ in the falkordb-browser repository?",
+      "gold": [
+        "#2084",
+        "#2146"
+      ],
+      "goldKeys": [
+        "dir:FalkorDB/falkordb-browser:e2e/tests",
+        "pr:FalkorDB/falkordb-browser#2084",
+        "pr:FalkorDB/falkordb-browser#2146"
+      ],
+      "detail": "falkordb-browser:e2e/tests",
+      "id": "impact-10",
+      "category": "impact"
+    },
+    {
+      "question": "Who reviewed the most pull requests in the falkordb-ts repository in 2025? Name the top three.",
+      "gold": [
+        "gkorland",
+        "barakb",
+        "anchel123"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/falkordb-ts"
+      ],
+      "detail": "gkorland=51, barakb=22, Anchel123=3, swilly22=1",
+      "id": "aggregation-01",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who opened the most issues in the falkordb-browser repository in 2025? Name the top three.",
+      "gold": [
+        "naseem77",
+        "anchel123",
+        "gkorland"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/falkordb-browser"
+      ],
+      "detail": "Naseem77=103, Anchel123=101, gkorland=42, barakb=38",
+      "id": "aggregation-02",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who reviewed the most pull requests in the falkordb-browser repository in 2024? Name the top three.",
+      "gold": [
+        "aviavni",
+        "gkorland",
+        "anchel123"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/falkordb-browser"
+      ],
+      "detail": "AviAvni=149, gkorland=26, Anchel123=8, swilly22=2",
+      "id": "aggregation-03",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who opened the most issues in the FalkorDB repository in 2024? Name the top three.",
+      "gold": [
+        "swilly22",
+        "aviavni",
+        "celinewuest"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/FalkorDB"
+      ],
+      "detail": "swilly22=35, AviAvni=26, CelineWuest=21, Aurora-yzj=18",
+      "id": "aggregation-04",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who opened the most issues in the FalkorDB repository in 2025? Name the top three.",
+      "gold": [
+        "swilly22",
+        "gkorland",
+        "swf2000"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/FalkorDB"
+      ],
+      "detail": "swilly22=85, gkorland=52, swf2000=26, dudizimber=20",
+      "id": "aggregation-05",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who opened the most issues in the QueryWeaver repository in 2025? Name the top three.",
+      "gold": [
+        "gkorland",
+        "danshalev7",
+        "naseem77"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/QueryWeaver"
+      ],
+      "detail": "gkorland=45, danshalev7=8, Naseem77=6, galshubeli=5",
+      "id": "aggregation-06",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who opened the most issues in the falkordb-ts repository in 2024? Name the top three.",
+      "gold": [
+        "naseem77",
+        "gkorland",
+        "dudizimber"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/falkordb-ts"
+      ],
+      "detail": "Naseem77=47, gkorland=19, dudizimber=3, Anchel123=2",
+      "id": "aggregation-07",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who reviewed the most pull requests in the GraphRAG-SDK repository in 2024? Name the top three.",
+      "gold": [
+        "swilly22",
+        "galshubeli",
+        "gkorland"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/GraphRAG-SDK"
+      ],
+      "detail": "swilly22=21, galshubeli=10, gkorland=7, barakb=1",
+      "id": "aggregation-08",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who opened the most issues in the falkordb-browser repository in 2024? Name the top three.",
+      "gold": [
+        "naseem77",
+        "gkorland",
+        "anchel123"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/falkordb-browser"
+      ],
+      "detail": "Naseem77=120, gkorland=98, Anchel123=98, swilly22=8",
+      "id": "aggregation-09",
+      "category": "aggregation"
+    },
+    {
+      "question": "Who reviewed the most pull requests in the FalkorDB repository in 2025? Name the top three.",
+      "gold": [
+        "swilly22",
+        "aviavni",
+        "gkorland"
+      ],
+      "goldKeys": [
+        "repo:FalkorDB/FalkorDB"
+      ],
+      "detail": "swilly22=91, AviAvni=41, gkorland=39, barakb=36",
+      "id": "aggregation-10",
+      "category": "aggregation"
+    }
+  ]
+}

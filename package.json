@@ -11,7 +11,9 @@
     "ingest:fetch": "tsx scripts/fetch.ts",
     "ingest:normalise": "tsx scripts/normalise.ts",
     "ingest:embed": "tsx scripts/embed.ts",
-    "ingest:load": "tsx scripts/load.ts"
+    "ingest:load": "tsx scripts/load.ts",
+    "eval:gold": "tsx eval/gold.ts",
+    "eval:run": "tsx --conditions=react-server eval/run.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.61",
