@@ -48,3 +48,6 @@ next-env.d.ts
 /.playwright-mcp/
 /data/graph/
 /data/*.log
+
+.vercel
+.env*
