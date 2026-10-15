@@ -112,22 +112,30 @@ There is also a light theme. Bloom only works when colours exceed 1.0 against a 
 
 ## Did the graph actually help?
 
-Sixty questions in six categories, with gold answers computed by a separate script from the raw GitHub JSON, without FalkorDB, so the graph never grades itself. Both systems use the same model, the same embeddings and the same FalkorDB vector index; the vector baseline takes the eight nearest chunks with their document metadata. Because Groq's free tier caps tokens per model per day, questions rotate across three models, and each question is answered by both systems with the same model.
+Sixty questions in six categories, with gold answers computed by a separate script from the raw GitHub JSON, without FalkorDB, so the graph never grades itself. Both systems use the same model, the same embeddings and the same FalkorDB vector index; the vector baseline takes the eight nearest chunks with their document metadata. Because Groq's free tier caps tokens per model per day, questions rotated across three Groq models, and the questions those caps left unfinished were completed on OpenAI gpt-5.6-luna; each question is answered by both systems with the same model.
 
 <!-- EVAL:START -->
-Run in progress: 31 of 60 questions answered by both systems so far (the rest resume as each model's daily Groq cap refills). These numbers cover finished pairs only. Models: qwen/qwen3.8-27b (7 pairs), openai/gpt-oss-120b (24 pairs).
+All 60 questions were answered by both systems. Models: qwen/qwen3.8-27b (Groq) on 7 questions, openai/gpt-oss-120b (Groq) on 24 questions, gpt-5.6-luna (OpenAI, reasoning off) on 29 questions.
+
+The questions were split across models: Groq's free daily token caps stopped the rotation part way, so the questions without a finished pair were completed with OpenAI gpt-5.6-luna. Each question was answered by one model, and its graph and vector runs always used that same model, so every comparison is paired within a question. The models received different mixes of categories, so the per-model rows are not a ranking of the models. Which model answered each question is listed in [`eval/summary.json`](https://github.com/StarKnightt/threadline/blob/main/eval/summary.json) and on every question at [/eval](https://threadline-graph.vercel.app/eval).
 
 | Category | Pairs | Graph agent F1 | Vector RAG F1 |
 |---|---|---|---|
-| Single-hop lookup (control) | 7 | 1.00 | 0.43 |
-| Expertise (PR to file to directory) | 7 | 0.76 | 0.00 |
-| Decision trace (issue to PR to release) | 5 | 0.80 | 0.00 |
-| Cross-repo connection | 4 | 1.00 | 0.00 |
-| Impact (open PRs under a directory) | 4 | 0.50 | 0.00 |
-| Aggregation (top reviewers or openers) | 4 | 1.00 | 0.00 |
-| **All** | **31** | **0.85** | **0.10** |
+| Single-hop lookup (control) | 10 | 1.00 | 0.60 |
+| Expertise (PR to file to directory) | 10 | 0.83 | 0.00 |
+| Decision trace (issue to PR to release) | 10 | 0.85 | 0.00 |
+| Cross-repo connection | 10 | 0.88 | 0.00 |
+| Impact (open PRs under a directory) | 10 | 0.30 | 0.10 |
+| Aggregation (top reviewers or openers) | 10 | 1.00 | 0.00 |
+| **All** | **60** | **0.81** | **0.12** |
 
-The graph agent used about 5,721 tokens per answer against 1,533 for the baseline. 96 percent of the graph agent's citations were verified by a graph path. The vector baseline does best on single-hop lookup questions (F1 0.43), the control category where the answer sits in one document. Widest gap: cross-repo connection and aggregation. Every question, gold answer, raw answer and score is in [`eval/`](https://github.com/StarKnightt/threadline/tree/main/eval) and on [/eval](https://threadline-graph.vercel.app/eval).
+| Model | Questions | Graph agent F1 | Vector RAG F1 |
+|---|---|---|---|
+| qwen/qwen3.8-27b (Groq) | 7 | 1.00 | 0.29 |
+| openai/gpt-oss-120b (Groq) | 24 | 0.81 | 0.04 |
+| gpt-5.6-luna (OpenAI, reasoning off) | 29 | 0.77 | 0.14 |
+
+The graph agent used about 6,190 tokens per answer against 1,479 for the baseline. 95 percent of the graph agent's citations were verified by a graph path. Median latency in the eval: 54.4 s graph and 9.4 s vector on qwen/qwen3.8-27b, 19.5 s graph and 1.5 s vector on openai/gpt-oss-120b, 7.2 s graph and 2.4 s vector on gpt-5.6-luna. The Groq runs went back to back under an 8,000 tokens per minute limit, so their graph latencies include waiting for that limit; single live questions took 1.6 to 15 s in testing. The vector baseline does best on single-hop lookup questions (F1 0.60), the control category where the answer sits in one document. Widest gap: aggregation. Every question, gold answer, raw answer and score is in [`eval/`](https://github.com/StarKnightt/threadline/tree/main/eval) and on [/eval](https://threadline-graph.vercel.app/eval).
 <!-- EVAL:END -->
 
 One honest detail from building the eval: the control category, "who opened the pull request titled X", depends heavily on phrasing for vector retrieval. With a question-first template the right chunk was in the top eight for 1 of 10 questions; with the title first, 6 of 10; with the bare title, 8 of 10. I used the title-first phrasing so the baseline gets a fair chance.

@@ -1,0 +1,12 @@
+{
+  "model": "gpt-5.6-luna",
+  "maxUsd": 1,
+  "calls": 116,
+  "input": 228894,
+  "cached": 160953,
+  "output": 6352,
+  "embedTokens": 809,
+  "usd": 0.01223101,
+  "rows": 58,
+  "updatedAt": "2026-10-15T09:58:52.962Z"
+}

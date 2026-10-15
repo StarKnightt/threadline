@@ -36,11 +36,22 @@ function stats(rs: R[]) {
 }
 
 const categories = ["lookup", "expertise", "trace", "cross_repo", "impact", "aggregation"];
+// Rows written before the provider field existed all came from Groq.
+const providerOf = (m: string) => (rows.find((r) => r.model === m && (r as { provider?: string }).provider) as { provider?: string } | undefined)?.provider ?? "groq";
+const modelInfo = Object.fromEntries(
+  [...new Set(paired.map((r) => r.model))].map((m) => [
+    m,
+    { provider: providerOf(m), questions: [...new Set(paired.filter((r) => r.model === m).map((r) => r.id))].sort((a, b) => a.localeCompare(b, "en", { numeric: true })) },
+  ]),
+);
 const summary = {
   model,
   generatedAt: new Date().toISOString(),
   pairedQuestions: both.size,
   totalQuestions: 60,
+  mixedModels: Object.keys(modelInfo).length > 1,
+  note: "Each question was answered by one model; its graph and vector runs always used that same model. Overall numbers pool questions across models, so compare systems within a model or within a question, not across models.",
+  modelInfo,
   overall: { graph: stats(paired.filter((r) => r.system === "graph")), vector: stats(paired.filter((r) => r.system === "vector")) },
   models: Object.fromEntries([...new Set(paired.map((r) => r.model))].map((m) => [m, { graph: stats(paired.filter((r) => r.model === m && r.system === "graph")), vector: stats(paired.filter((r) => r.model === m && r.system === "vector")) }])),
   categories: Object.fromEntries(

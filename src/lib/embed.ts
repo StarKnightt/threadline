@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 import { SHARED, query } from "./falkor";
 
 const memo = new Map<string, number[]>();
+/** Embedding tokens billed by OpenAI in this process (cache hits cost nothing). */
+export const embedMeter = { calls: 0, tokens: 0 };
 
 /**
  * Question embedding (text-embedding-3-small, 256 dims). Cached in memory and in the shared FalkorDB graph,
@@ -33,6 +35,8 @@ export async function embedQuestion(text: string): Promise<number[]> {
   const json = (await res.json()) as { data: { embedding: number[] }[]; usage: { total_tokens: number } };
   const e = json.data[0].embedding.map((x) => Math.round(x * 1e5) / 1e5);
   memo.set(h, e);
+  embedMeter.calls++;
+  embedMeter.tokens += json.usage.total_tokens;
   query(SHARED, "MERGE (q:QueryEmbedding {h: $h}) SET q.e = $e, q.at = timestamp() WITH q MERGE (s:Spend {key: 'openai'}) SET s.tokens = coalesce(s.tokens, 0) + $t", { h, e, t: json.usage.total_tokens }).catch(() => {});
   return e;
 }

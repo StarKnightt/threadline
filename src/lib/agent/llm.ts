@@ -65,9 +65,26 @@ function defaultProviders(): Providers {
 
 type GenOpts = Omit<Parameters<typeof generateText>[0], "model">;
 
+/** Model ids prefixed "openai:" call OpenAI directly with the caller's own step and token budgets (eval only). */
+export const OPENAI_DIRECT = "openai:";
+/** Token usage of every direct OpenAI call in this process, summed across all steps. */
+export const openaiMeter = { calls: 0, input: 0, cached: 0, output: 0 };
+
 export async function generateWithFallback(opts: GenOpts, models = MODELS, paid?: PaidRun, providers: Providers = defaultProviders()) {
   let last: unknown;
   for (const id of models) {
+    if (id.startsWith(OPENAI_DIRECT)) {
+      if (!providers.openai) throw new Error("OPENAI_API_KEY is not set");
+      // Metered per step so a call that fails part way still counts the steps OpenAI billed.
+      const onStepFinish = ({ usage }: { usage?: { inputTokens?: number; outputTokens?: number; inputTokenDetails?: { cacheReadTokens?: number } } }) => {
+        openaiMeter.calls++;
+        openaiMeter.input += usage?.inputTokens ?? 0;
+        openaiMeter.cached += usage?.inputTokenDetails?.cacheReadTokens ?? 0;
+        openaiMeter.output += usage?.outputTokens ?? 0;
+      };
+      const res = await generateText({ ...opts, maxRetries: 1, onStepFinish, model: providers.openai(id.slice(OPENAI_DIRECT.length)), providerOptions: { openai: { reasoningEffort: "none", parallelToolCalls: false } } } as Parameters<typeof generateText>[0]);
+      return { res, model: id };
+    }
     try {
       // gpt-oss models take low reasoning effort; Qwen3 supports turning thinking off entirely.
       const reasoningEffort = id.startsWith("qwen/") ? "none" : "low";
