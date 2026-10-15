@@ -1,4 +1,4 @@
-// Write the evaluation results from eval/summary.json into README.md, docs/BLOG_DRAFT.md and docs/VIDEO_SCRIPT.md.
+// Write the evaluation results from eval/summary.json into README.md, docs/BLOG.md and docs/VIDEO_SCRIPT.md.
 // Usage: pnpm eval:summary && pnpm eval:docs
 import { readFileSync, writeFileSync } from "node:fs";
 
@@ -74,7 +74,7 @@ function between(file: string, start: string, end: string, body: string) {
 }
 
 between("README.md", "<!-- EVAL:START -->", "<!-- EVAL:END -->", `Method: 60 questions in six categories, generated from templates over the raw GitHub JSON. Gold answers are computed by \`eval/gold.ts\` from that JSON without FalkorDB, so the graph never grades itself. Both systems use the same model, the same 256-dimension embeddings and the same FalkorDB vector index; scores are set-based F1 over each answer's final ANSWER line.\n\n${block}`);
-between("docs/BLOG_DRAFT.md", "<!-- EVAL:START -->", "<!-- EVAL:END -->", block.replace("(eval/)", "(https://github.com/StarKnightt/threadline/tree/main/eval)").replace("(eval/summary.json)", "(https://github.com/StarKnightt/threadline/blob/main/eval/summary.json)"));
+between("docs/BLOG.md", "<!-- EVAL:START -->", "<!-- EVAL:END -->", block.replace("(eval/)", "(https://github.com/StarKnightt/threadline/tree/main/eval)").replace("(eval/summary.json)", "(https://github.com/StarKnightt/threadline/blob/main/eval/summary.json)"));
 
 const vs = readFileSync("docs/VIDEO_SCRIPT.md", "utf8").split("\n");
 const i = vs.findIndex((l) => l.startsWith("| 2:12 to 2:28 |"));

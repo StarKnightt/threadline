@@ -137,7 +137,7 @@ FalkorDB details we ran into (documented in `docs/CYPHER.md`): `shortestPath()` 
 
 ## Agent design
 
-- **Investigator:** Vercel AI SDK `generateText` with typed tools on Groq (`openai/gpt-oss-120b`, falling back to `gpt-oss-20b` and `qwen/qwen3.8-27b` when rate limited; for live questions only, OpenAI `gpt-5.6-luna` with reasoning off when every Groq model is capped), temperature 0, at most six steps. The system prompt lists short plans per question type and requires node-key citations.
+- **Investigator:** Vercel AI SDK `generateText` with typed tools on Groq (`openai/gpt-oss-120b`, falling back to `gpt-oss-20b` and `qwen/qwen3.8-27b` when rate limited; for live questions only, OpenAI `gpt-5.4-mini` with reasoning off when every Groq model is capped), temperature 0, at most six steps. The system prompt lists short plans per question type and requires node-key citations.
 - **Tools** return `{rows, refs, edges, cypher, ms}`. `refs` and `edges` drive the 3D highlight and the citations.
 - **Verifier:** deterministic, no LLM. Entry nodes are what the investigation started from. Each citation must be observed in a tool result and reachable within four hops over work relationships.
 - **Handoff:** if any citation is rejected, the Verifier hands the claim back once with the reason, and the Investigator rewrites the answer. Claims, verdicts and the handoff are written to `tl_shared`.
@@ -153,14 +153,22 @@ graph TD
   C[Vercel Cron, daily] -- /api/cron/sync --> F
   F -- typed tools, GRAPH.RO_QUERY as read-only user --> D[(FalkorDB Cloud free, AWS ap-south-1)]
   F -- memory, traces, coordination --> D
-  F -- tool calling --> G[Groq: gpt-oss-120b / 20b, qwen3.8-27b<br/>live fallback: OpenAI gpt-5.6-luna]
+  F -- tool calling --> G[Groq: gpt-oss-120b / 20b, qwen3.8-27b<br/>live fallback: OpenAI gpt-5.4-mini]
   F -- question embeddings, cached in FalkorDB --> O[OpenAI text-embedding-3-small, 256 dims]
   C -- updated issues and PRs --> GH[GitHub GraphQL]
 ```
 
 **Cost and abuse guards:** 10 live questions per IP per hour and a global daily cap (counters in FalkorDB); recorded showcase runs replay without any LLM call; six tool steps and capped output tokens per answer; question length cap; question embeddings cached in FalkorDB; read-only database user for agent queries; MCP calls capped per hour. The free tier has no TLS, so only public GitHub data and least-privilege credentials travel over that connection.
 
-**Paid fallback (live questions only):** Groq's free daily caps are shared with the evaluation, so when every Groq model is rate limited, a live question continues on OpenAI `gpt-5.6-luna` (reasoning off). Each run is capped at 4 OpenAI calls and 2,000 output tokens per call (the last allowed call must answer), and paid runs are capped at 30 per day and 100 per 30 days across all visitors (atomic counters in FalkorDB). Scripts and recorded showcase replays never use it; the evaluation does not go through it either (its OpenAI questions came from a separate, budget-capped run described under Reproducing the evaluation). At OpenAI's Standard prices for `gpt-5.6-luna` ($0.20 input, $0.02 cached input, $1.20 output per million tokens), real production questions answered this way cost $0.0003 to $0.0009 each (for example 3 calls, 6,674 input tokens with 3,870 cached, 190 output: about $0.0009). The worst case is bigger: 4 calls at the 2,000-token output cap is $0.0096 of output alone, so a worst-case run is roughly $0.01 to $0.02 and the 100-run monthly cap bounds the fallback at roughly $1 to $2 a month. When the paid budget is also used up, the app says so and points to the recorded runs.
+**Paid fallback (live questions only):** Groq's free daily caps are shared with the evaluation, so when every Groq model is rate limited, a live question continues on OpenAI `gpt-5.4-mini` (reasoning off; `OPENAI_FALLBACK_MODEL` overrides it). Each run is capped at 4 OpenAI calls and 2,000 output tokens per call (the last allowed call must answer), and paid runs are capped at 10 per day and 25 per 30 days across all visitors (atomic counters in FalkorDB; `OPENAI_DAILY_RUNS` and `OPENAI_MONTHLY_RUNS` override them). Scripts and recorded showcase replays never use it; the evaluation does not go through it either (its OpenAI questions came from a separate, budget-capped run on `gpt-5.6-luna`, described under Reproducing the evaluation).
+
+At OpenAI's Standard prices for `gpt-5.4-mini` ($0.75 input, $0.075 cached input, $4.50 output per million tokens):
+
+- **Typical run:** about $0.001 to $0.0035. These are the token counts of the production fallback runs measured before the switch from `gpt-5.6-luna`, priced at `gpt-5.4-mini` rates (every rate is 3.75 times luna's). For example, 3 calls with 6,674 input tokens (3,870 cached) and 190 output tokens cost $0.0032.
+- **Worst-case run:** about $0.07. Output is hard-capped at 4 x 2,000 tokens ($0.036); input is not hard-capped, but tool results are clipped, and even 50,000 uncached input tokens (more than five times the measured runs) adds $0.0375.
+- **Worst case per month at the caps:** 25 runs x $0.07, so under $2. The daily cap of 10 runs bounds a single day at about $0.74. A month of 25 typical runs is under $0.10.
+
+When the paid budget is also used up, the app says so and points to the recorded runs.
 
 ## Setup
 
@@ -206,10 +214,10 @@ pnpm eval:run --model openai/gpt-oss-120b --wait # one run per model in the rota
                                                  # resumable, waits for Groq's daily bucket to refill with --wait
 pnpm eval:run --model openai:gpt-5.6-luna --max-usd 1 # completes every question without a finished Groq pair on OpenAI
 pnpm eval:summary                                # eval/summary.json across all models
-pnpm eval:docs                                   # writes the results into README, blog draft and video script
+pnpm eval:docs                                   # writes the results into README and docs/BLOG.md
 ```
 
-Questions rotate round-robin across the three Groq models because each has its own daily token cap; both systems always answer a given question with the same model. `powershell -File eval/resume.ps1` relaunches all three runs detached. The Groq caps stopped the rotation after 31 complete pairs (gpt-oss-120b 24, qwen3.8-27b 7, gpt-oss-20b none), so the other 29 questions were answered by OpenAI `gpt-5.6-luna` with reasoning off, both systems for each question, with the same six-step and output-token budgets as the Groq runs. Two Groq vector rows whose graph half never ran (trace-06 on qwen3.8-27b, lookup-02 on gpt-oss-20b) stay in `eval/results.jsonl` for the record but are not scored; those questions were rerun as OpenAI pairs. That run stops before its spend ledger passes `--max-usd`; it used 116 OpenAI calls (228,894 input tokens, 160,953 of them cached, 6,352 output) plus 809 embedding tokens, about $0.024 at OpenAI's Standard prices, and at most $0.028 if every uncached input token was billed at the cache-write rate (ledger in `eval/openai-spend.json`). All questions, gold answers, raw answers and scores are committed in `eval/`.
+Questions rotate round-robin across the three Groq models because each has its own daily token cap; both systems always answer a given question with the same model. `powershell -File eval/resume.ps1` relaunches all three runs detached. The Groq caps stopped the rotation after 31 complete pairs (gpt-oss-120b 24, qwen3.8-27b 7, gpt-oss-20b none), so the other 29 questions were answered by OpenAI `gpt-5.6-luna` with reasoning off, both systems for each question, with the same six-step and output-token budgets as the Groq runs. Two Groq vector rows whose graph half never ran (trace-06 on qwen3.8-27b, lookup-02 on gpt-oss-20b) stay in `eval/results.jsonl` for the record but are not scored; those questions were rerun as OpenAI pairs. Three Groq rows that a rotation run wrote after the summary was frozen (the two missing graph halves above and one lookup-05 vector row, all exact) are kept apart in `eval/results-late-groq.jsonl` and not scored, so the scored set stays one model per question. The OpenAI run stops before its spend ledger passes `--max-usd`; it used 116 OpenAI calls (228,894 input tokens, 160,953 of them cached, 6,352 output) plus 809 embedding tokens, about $0.024 at OpenAI's Standard prices, and at most $0.028 if every uncached input token was billed at the cache-write rate (ledger in `eval/openai-spend.json`). All questions, gold answers, raw answers and scores are committed in `eval/`.
 
 ## Data source and privacy
 
@@ -219,6 +227,7 @@ Public data only: issues, pull requests, reviews, file paths, releases and docs 
 
 - The free FalkorDB tier has no persistence and stops after a day without use. The daily cron keeps it in use, and the graph can be rebuilt from the cached data in about two minutes.
 - Groq's free limits (8,000 tokens per minute and a daily token cap per model) mean concurrent live questions can be slowed. Past the daily caps, live questions run on the capped OpenAI fallback, then stop until the limits reset; the recorded runs always replay.
+- The impact category's eval score (graph F1 0.30) is from before a fix: the eval questions write directory paths with a trailing slash, which the `impact` tool did not strip, so its query matched nothing and the agent answered "none" on six of the seven misses. The tool now strips slashes and its query returns the gold PRs for 9 of the 10 impact questions (the tenth is under `.claude/`, which the tool skips on purpose). The agent evaluation has not been rerun, so the published numbers are the measured, pre-fix ones.
 - Expertise is inferred from authored and reviewed PRs, which misses design discussions in other channels.
 - Release attribution falls back to "first release after the merge" when release notes do not list a PR; the source is recorded on each `SHIPPED_IN` edge.
 - `Decision` nodes extracted by an LLM, planned as optional, were not built.
