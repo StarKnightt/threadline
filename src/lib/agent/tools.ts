@@ -295,7 +295,12 @@ export function makeTools(ctx: ToolCtx) {
           const p = { term, repo: repo ?? null };
           const [a, b, c] = [await run(Q.impactOpenPrs, p), await run(Q.impactOpenIssues, p), await run(Q.coChanges, p)];
           const rows = [...a.rows.map((x) => ({ ...x, kind: "open_pr" })), ...b.rows.map((x) => ({ ...x, kind: "open_issue" })), ...c.rows.map((x) => ({ ...x, kind: "co_changes" }))];
-          return { runs: [a, b, c], rows };
+          const edges: TraceEdge[] = [
+            ...a.rows.map((x) => [x.key as string, "TOUCHED", x.areaKey as string] as TraceEdge),
+            ...b.rows.map((x) => [x.key as string, "LINKED_TO_FIX_IN", x.areaKey as string] as TraceEdge),
+            ...c.rows.map((x) => [x.areaKey as string, "CO_CHANGES", x.key as string] as TraceEdge),
+          ];
+          return { runs: [a, b, c], rows, edges };
         }),
     }),
 

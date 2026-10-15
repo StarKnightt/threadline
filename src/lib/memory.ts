@@ -71,7 +71,7 @@ CREATE (task)-[:HANDED_OFF {from: 'verifier', to: 'investigator', reason: $reaso
 
   saveTrace: `CREATE (t:Trace {id: $id, question: $q, mode: $mode, at: $now, showcase: $showcase, verified: $verified, total: $total, json: $json})`,
   getTrace: `MATCH (t:Trace {id: $id}) RETURN t.json AS json`,
-  listShowcase: `MATCH (t:Trace) WHERE t.showcase = true RETURN t.id AS id, t.question AS question, t.mode AS mode, t.verified AS verified, t.total AS total, t.at AS at ORDER BY t.at ASC`,
+  listShowcase: `MATCH (t:Trace) WHERE t.showcase = true RETURN t.id AS id, t.question AS question, t.mode AS mode, t.verified AS verified, t.total AS total, t.at AS at ORDER BY t.id ASC`,
 };
 
 let sharedReady: Promise<void> | null = null;

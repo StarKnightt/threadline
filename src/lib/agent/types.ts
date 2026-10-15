@@ -14,7 +14,7 @@ export type TraceStep = {
   agent?: "investigator" | "verifier";
 };
 
-export type Citation = { key: string; observed: boolean; hops: number | null; path: TraceEdge[]; ok: boolean };
+export type Citation = { key: string; observed: boolean; hops: number | null; path: TraceEdge[]; ok: boolean; basis?: "path" | "observed" };
 
 export type Verification = {
   entry: string[];

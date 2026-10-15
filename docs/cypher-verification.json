@@ -1,11 +1,11 @@
 {
-  "at": "2026-10-15T06:58:27.495Z",
+  "at": "2026-10-15T07:06:07.970Z",
   "results": [
     {
       "name": "vectorEntry",
       "ok": true,
       "rows": 6,
-      "ms": 472,
+      "ms": 463,
       "params": {
         "vec": "[256-dim vector]",
         "k": 16,
@@ -27,7 +27,7 @@
       "name": "fulltextEntry",
       "ok": true,
       "rows": 6,
-      "ms": 68,
+      "ms": 66,
       "params": {
         "text": "vector | index",
         "limit": 6
@@ -47,7 +47,7 @@
       "name": "byKeys",
       "ok": true,
       "rows": 2,
-      "ms": 68,
+      "ms": 67,
       "params": {
         "keys": [
           "person:swilly22",
@@ -68,7 +68,7 @@
       "name": "threadByNumber",
       "ok": true,
       "rows": 1,
-      "ms": 68,
+      "ms": 66,
       "params": {
         "number": 1000,
         "repo": "FalkorDB"
@@ -89,7 +89,7 @@
       "name": "conceptMatch",
       "ok": true,
       "rows": 1,
-      "ms": 68,
+      "ms": 70,
       "params": {
         "text": "vector index"
       },
@@ -107,7 +107,7 @@
       "name": "details",
       "ok": true,
       "rows": 1,
-      "ms": 67,
+      "ms": 68,
       "params": {
         "key": "pr:FalkorDB/FalkorDB#1461"
       },
@@ -177,7 +177,7 @@
       "name": "expand",
       "ok": true,
       "rows": 10,
-      "ms": 84,
+      "ms": 85,
       "params": {
         "key": "person:swilly22",
         "types": [
@@ -202,11 +202,11 @@
       "name": "whoKnowsArea",
       "ok": true,
       "rows": 10,
-      "ms": 67,
+      "ms": 70,
       "params": {
         "term": "src/index",
         "repo": "FalkorDB",
-        "now": 1792047503
+        "now": 1792047963
       },
       "first": {
         "key": "person:swilly22",
@@ -216,18 +216,18 @@
         "authored": 17,
         "reviewed": 12,
         "daysSinceLast": 0,
-        "score": 45.8691432686867
+        "score": 45.8677865625486
       }
     },
     {
       "name": "whoKnowsConcept",
       "ok": true,
       "rows": 10,
-      "ms": 109,
+      "ms": 112,
       "params": {
         "concept": "concept:vector-index",
         "repo": null,
-        "now": 1792047503
+        "now": 1792047963
       },
       "first": {
         "key": "person:AviAvni",
@@ -235,7 +235,7 @@
         "area": "concept:vector-index",
         "prs": 17,
         "daysSinceLast": 3,
-        "score": 26.4807472166802,
+        "score": 26.4799639757097,
         "sample": [
           "pr:FalkorDB/FalkorDB#1374",
           "pr:FalkorDB/FalkorDB#765",
@@ -247,7 +247,7 @@
       "name": "declaredOwners",
       "ok": true,
       "rows": 0,
-      "ms": 67,
+      "ms": 71,
       "params": {
         "areas": [
           "dir:FalkorDB/FalkorDB:/",
@@ -260,7 +260,7 @@
       "name": "traceIssue",
       "ok": true,
       "rows": 1,
-      "ms": 70,
+      "ms": 71,
       "params": {
         "key": "issue:FalkorDB/FalkorDB#1462"
       },
@@ -283,7 +283,7 @@
       "name": "tracePr",
       "ok": true,
       "rows": 1,
-      "ms": 70,
+      "ms": 80,
       "params": {
         "key": "pr:FalkorDB/FalkorDB#1461"
       },
@@ -326,7 +326,7 @@
       "name": "references",
       "ok": true,
       "rows": 3,
-      "ms": 69,
+      "ms": 67,
       "params": {
         "key": "issue:FalkorDB/FalkorDB#687"
       },
@@ -344,7 +344,7 @@
       "name": "connect",
       "ok": true,
       "rows": 3,
-      "ms": 85,
+      "ms": 84,
       "params": {
         "a": "pr:FalkorDB/falkordb-browser#1918",
         "b": "person:swilly22"
@@ -365,7 +365,7 @@
       "name": "impactOpenPrs",
       "ok": true,
       "rows": 15,
-      "ms": 71,
+      "ms": 69,
       "params": {
         "term": "src/index",
         "repo": "FalkorDB"
@@ -373,6 +373,7 @@
       "first": {
         "key": "pr:FalkorDB/FalkorDB#2527",
         "name": "feat(index): the tag and geo kinds, and the xfail ledger closes",
+        "areaKey": "dir:FalkorDB/FalkorDB:graph/src/index",
         "area": "graph/src/index",
         "files": 16,
         "createdAt": 1786881261
@@ -382,7 +383,7 @@
       "name": "impactOpenIssues",
       "ok": true,
       "rows": 10,
-      "ms": 73,
+      "ms": 71,
       "params": {
         "term": "src/index",
         "repo": "FalkorDB"
@@ -390,7 +391,8 @@
       "first": {
         "key": "issue:FalkorDB/FalkorDB#3134",
         "name": "Rust - CCH implementation",
-        "area": "graph/src/index/cch",
+        "areaKey": "dir:FalkorDB/FalkorDB:graph/src/index",
+        "area": "graph/src/index",
         "viaPrs": 5
       }
     },
@@ -406,6 +408,7 @@
       "first": {
         "key": "dir:FalkorDB/FalkorDB:tests/flow",
         "name": "tests/flow",
+        "areaKey": "dir:FalkorDB/FalkorDB:src/index",
         "repo": "FalkorDB/FalkorDB",
         "together": 27
       }
@@ -414,7 +417,7 @@
       "name": "activity.AUTHORED",
       "ok": true,
       "rows": 5,
-      "ms": 73,
+      "ms": 74,
       "params": {
         "repo": "falkordb-browser",
         "since": 1735689600,
@@ -437,7 +440,7 @@
       "name": "activity.REVIEWED",
       "ok": true,
       "rows": 5,
-      "ms": 76,
+      "ms": 73,
       "params": {
         "repo": "falkordb-ts",
         "since": 1735689600,
@@ -459,7 +462,7 @@
       "name": "activity.MERGED",
       "ok": true,
       "rows": 5,
-      "ms": 86,
+      "ms": 83,
       "params": {
         "repo": "FalkorDB",
         "since": 0,
@@ -481,7 +484,7 @@
       "name": "activity.COMMENTED_ON",
       "ok": true,
       "rows": 5,
-      "ms": 103,
+      "ms": 102,
       "params": {
         "repo": null,
         "since": 0,
@@ -503,7 +506,7 @@
       "name": "activityInArea",
       "ok": true,
       "rows": 4,
-      "ms": 157,
+      "ms": 131,
       "params": {
         "area": "src/index",
         "repo": "FalkorDB",
@@ -528,7 +531,7 @@
       "name": "pageRankReviewers",
       "ok": true,
       "rows": 10,
-      "ms": 69,
+      "ms": 70,
       "params": {},
       "first": {
         "key": "person:AviAvni",
@@ -540,12 +543,12 @@
       "name": "betweennessBridges",
       "ok": true,
       "rows": 10,
-      "ms": 71,
+      "ms": 75,
       "params": {},
       "first": {
         "key": "person:barakb",
         "person": "barakb",
-        "score": 75.0414772662838,
+        "score": 96.189364538124,
         "repos": [
           "FalkorDB-MCPServer",
           "falkordb-ts",
@@ -560,7 +563,7 @@
       "name": "subsystems",
       "ok": true,
       "rows": 8,
-      "ms": 796,
+      "ms": 747,
       "params": {},
       "first": {
         "communityId": 26049,
@@ -591,7 +594,7 @@
       "name": "verifyPath",
       "ok": true,
       "rows": 1,
-      "ms": 70,
+      "ms": 72,
       "params": {
         "entry": "concept:vector-index",
         "cited": "person:swilly22"
@@ -613,7 +616,7 @@
       "name": "neighbourhood",
       "ok": true,
       "rows": 40,
-      "ms": 94,
+      "ms": 97,
       "params": {
         "key": "repo:FalkorDB/falkordb-ts"
       },
@@ -649,7 +652,7 @@
       "name": "vectorRag",
       "ok": true,
       "rows": 8,
-      "ms": 69,
+      "ms": 70,
       "params": {
         "vec": "[256-dim vector]",
         "k": 8

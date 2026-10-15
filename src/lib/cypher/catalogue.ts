@@ -108,7 +108,7 @@ WHERE d.depth > 0 AND NOT d.path STARTS WITH '.' AND toLower(d.path) CONTAINS to
 WITH d ORDER BY d.depth ASC LIMIT 3
 MATCH (d)<-[:IN_DIR*1..6]-(f:File)<-[t:TOUCHED]-(pr:PullRequest)
 WHERE pr.state = 'OPEN'
-RETURN pr.key AS key, pr.title AS name, d.path AS area, count(DISTINCT f) AS files, pr.createdAt AS createdAt
+RETURN pr.key AS key, pr.title AS name, d.key AS areaKey, d.path AS area, count(DISTINCT f) AS files, pr.createdAt AS createdAt
 ORDER BY files DESC LIMIT 15`,
 
   /** Q7b: impact. Open issues connected to past fixes in the area (fixed by a PR that touched it, then referenced again). */
@@ -117,7 +117,7 @@ WHERE d.depth > 0 AND NOT d.path STARTS WITH '.' AND toLower(d.path) CONTAINS to
 WITH d ORDER BY d.depth ASC LIMIT 3
 MATCH (d)<-[:IN_DIR*1..6]-(:File)<-[:TOUCHED]-(pr:PullRequest)-[:CLOSES|REFERENCES]-(i:Issue)
 WHERE i.state = 'OPEN'
-RETURN i.key AS key, i.title AS name, d.path AS area, count(DISTINCT pr) AS viaPrs
+RETURN i.key AS key, i.title AS name, d.key AS areaKey, d.path AS area, count(DISTINCT pr) AS viaPrs
 ORDER BY viaPrs DESC LIMIT 10`,
 
   /** Q7c: impact. Directories that usually change together with the area (derived CO_CHANGES). */
@@ -125,7 +125,7 @@ ORDER BY viaPrs DESC LIMIT 10`,
 WHERE d.depth > 0 AND NOT d.path STARTS WITH '.' AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
 WITH d ORDER BY d.depth ASC LIMIT 3
 MATCH (d)-[c:CO_CHANGES]-(o:Directory)
-RETURN o.key AS key, o.path AS name, o.repo AS repo, c.count AS together
+RETURN o.key AS key, o.path AS name, d.key AS areaKey, o.repo AS repo, c.count AS together
 ORDER BY together DESC LIMIT 8`,
 
   /** Activity aggregation: who authored, reviewed, merged or commented most, optionally per repo, area and time window. */

@@ -74,9 +74,19 @@ export async function verify(steps: TraceStep[], answer: string, emit: (e: Recor
   const first = steps.find((s) => s.tool === "find_entities" && !s.error);
   const fromFind = (first?.rows ?? []).map((r) => r.key as string).filter((k) => k && KEY_RE.test(k)).slice(0, 4);
   const fromArgs = steps.flatMap((s) => Object.values(s.args).flat().filter((v): v is string => typeof v === "string" && KEY_RE.test(v)));
-  const anchors = steps.filter((s) => s.agent !== "verifier" && !s.error).slice(0, 2).flatMap((s) => s.refs.filter((r) => /^(concept|dir|file|repo|issue|pr):/.test(r)).slice(0, 3));
+  const early = steps.filter((s) => s.agent !== "verifier" && !s.error).slice(0, 2).flatMap((s) => s.refs);
+  const areaAnchors = early.filter((r) => /^(concept|dir|file|repo):/.test(r)).slice(0, 3);
+  const anchors = areaAnchors.length ? areaAnchors : early.filter((r) => /^(issue|pr):/.test(r)).slice(0, 2);
   const entry = [...new Set([...fromFind, ...fromArgs, ...anchors])].slice(0, 6);
-  const cited = citedKeys(answer).slice(0, 12);
+  // Resolve abbreviated citations (pr:#2527, person:aviavni) to the observed key they clearly refer to.
+  const canonical = (k: string) => {
+    if (observed.has(k)) return k;
+    const [prefix, rest] = [k.split(":")[0], k.slice(k.indexOf(":") + 1).toLowerCase()];
+    const num = /#(\d+)$/.exec(rest)?.[1];
+    const match = [...observed].filter((o) => o.startsWith(prefix + ":") && (num ? o.endsWith(`#${num}`) : o.slice(prefix.length + 1).toLowerCase() === rest));
+    return match.length === 1 ? match[0] : k;
+  };
+  const cited = [...new Set(citedKeys(answer).map(canonical))].slice(0, 12);
   const citations: Citation[] = [];
   const t0 = Date.now();
   const queries: TraceStep["queries"] = [];
@@ -98,7 +108,9 @@ export async function verify(steps: TraceStep[], answer: string, emit: (e: Recor
         queries.push({ cypher: Q.verifyPath, params: { entry: e, cited: key }, rows: 0, ms: Date.now() - t });
       }
     }
-    const c: Citation = { key, observed: observed.has(key), hops, path, ok: observed.has(key) && hops !== null };
+    // Org-wide algorithm questions have no entry node; then a citation must at least come from tool output.
+    const ok = observed.has(key) && (hops !== null || entry.length === 0);
+    const c: Citation = { key, observed: observed.has(key), hops, path, ok, basis: hops !== null ? "path" : ok ? "observed" : undefined };
     citations.push(c);
     emit({ type: "verify", ...c });
   }
@@ -140,16 +152,11 @@ export async function runGraphAgent(question: string, emit: (e: Record<string, u
     const reason = `${rejected.length} citation(s) failed verification (not seen in tool results or not connected to the question's entry nodes): ${rejected.join(", ")}`;
     emit({ type: "handoff", from: "verifier", to: "investigator", reason, rejected });
     try {
+      const observed = [...new Set(ctx.steps.filter((s) => s.agent !== "verifier").flatMap((s) => s.refs))].slice(0, 60);
       const fix = await generateWithFallback(
         {
-          system: systemPrompt(now, mem),
-          messages: [
-            ...messages,
-            ...res.response.messages,
-            { role: "user", content: `Verifier: ${reason}. Rewrite the answer using only keys that appeared in tool results. Remove claims you cannot support. Keep the ANSWER line.` },
-          ],
-          tools,
-          toolChoice: "none",
+          system: "You revise answers from a graph agent so that every citation is a full node key that was observed in the tool results. Keep the same facts, drop claims you cannot cite, keep it under 150 words, and keep the final ANSWER line.",
+          prompt: `Question: ${question}\n\nDraft answer:\n${answer}\n\nNode keys observed in tool results:\n${observed.join("\n")}\n\nVerifier: ${reason}.\n\nRewrite the answer, citing only keys from the observed list in square brackets.`,
           maxOutputTokens: 700,
           temperature: 0,
         },
