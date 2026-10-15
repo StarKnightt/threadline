@@ -1,7 +1,8 @@
 // Record demo footage: one 1920x1080 clip per scene (webm) into demo/footage/, matching docs/VIDEO_SCRIPT.md.
 // Replay scenes use stored showcase runs (no LLM). Pass --live to also record the live and memory scenes.
-// Usage: node scripts/demo-capture.mjs [baseUrl] [--live] [--only 03]
-import { mkdirSync, readdirSync, renameSync, rmSync } from "node:fs";
+// Usage: node scripts/demo-capture.mjs [baseUrl] [--live] [--only 03] [--force]
+// Resumable: clips that already exist are skipped unless --force is given.
+import { existsSync, mkdirSync, readdirSync, renameSync, rmSync } from "node:fs";
 import { chromium } from "playwright-core";
 
 const base = process.argv.find((a) => a.startsWith("http")) ?? "https://threadline-graph.vercel.app";
@@ -17,6 +18,7 @@ const browser = await chromium.launch({ channel: "chrome", args: ["--use-angle=d
 
 async function scene(name, fn) {
   if (only && !name.startsWith(only)) return;
+  if (!process.argv.includes("--force") && existsSync(`${dir}${name}.webm`)) return console.log(`${name}.webm exists, skipped`);
   const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, recordVideo: { dir: tmp, size: { width: 1920, height: 1080 } } });
   const page = await ctx.newPage();
   await page.addInitScript(() => localStorage.setItem("tl_user", "demo-capture-user-0001"));
@@ -109,6 +111,14 @@ await scene("10-how-data-model", async (page) => {
     await sleep(650);
   }
   await sleep(1500);
+});
+
+await scene("13-light-theme", async (page) => {
+  await openShowcase(page, 0, 4500);
+  await page.click("button[aria-label='Switch to light theme']");
+  await sleep(1200);
+  await page.click("button:has-text('Replay')");
+  await sleep(8000);
 });
 
 if (live) {
