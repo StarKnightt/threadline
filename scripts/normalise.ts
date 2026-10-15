@@ -195,14 +195,12 @@ for (const r of raw) {
     };
     if (kind === "pr") Object.assign(props, { mergedAt: ts(t.mergedAt), additions: t.additions, deletions: t.deletions, changedFiles: t.changedFiles, baseRef: t.baseRefName });
     else props.stateReason = t.stateReason ?? null;
+    if (t.author?.login) props.author = t.author.login;
     node(key, labels, props);
     edge("IN_REPO", key, repoKey);
 
     const author = person(t.author, createdAt);
-    if (author) {
-      edge("AUTHORED", author, key, { at: createdAt });
-      props.author = t.author.login;
-    }
+    if (author) edge("AUTHORED", author, key, { at: createdAt });
     for (const l of (t.labels?.nodes ?? []).filter(Boolean)) {
       const lk = `label:${full}:${l.name}`;
       node(lk, "Entity:Label", { name: l.name, color: l.color, repo: full });

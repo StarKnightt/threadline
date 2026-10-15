@@ -1,33 +1,33 @@
 {
-  "at": "2026-10-15T06:20:37.255Z",
+  "at": "2026-10-15T06:46:10.243Z",
   "results": [
     {
       "name": "vectorEntry",
       "ok": true,
       "rows": 6,
-      "ms": 567,
+      "ms": 509,
       "params": {
         "vec": "[256-dim vector]",
         "k": 16,
         "limit": 6
       },
       "first": {
-        "key": "issue:FalkorDB/FalkorDB#804",
+        "key": "pr:FalkorDB/FalkorDB#3",
         "labels": [
           "Entity",
           "Thread",
-          "Issue"
+          "PullRequest"
         ],
-        "name": "Dedicated vector format",
+        "name": "Add vector index capabilities",
         "repo": "FalkorDB/FalkorDB",
-        "score": 0.435119450092316
+        "similarity": 0.999999940395355
       }
     },
     {
       "name": "fulltextEntry",
       "ok": true,
       "rows": 6,
-      "ms": 68,
+      "ms": 67,
       "params": {
         "text": "vector | index",
         "limit": 6
@@ -47,7 +47,7 @@
       "name": "byKeys",
       "ok": true,
       "rows": 2,
-      "ms": 68,
+      "ms": 64,
       "params": {
         "keys": [
           "person:swilly22",
@@ -55,12 +55,12 @@
         ]
       },
       "first": {
-        "key": "repo:FalkorDB/QueryWeaver",
+        "key": "person:swilly22",
         "labels": [
           "Entity",
-          "Repo"
+          "Person"
         ],
-        "name": "QueryWeaver",
+        "name": "swilly22",
         "repo": null
       }
     },
@@ -68,7 +68,7 @@
       "name": "threadByNumber",
       "ok": true,
       "rows": 1,
-      "ms": 69,
+      "ms": 65,
       "params": {
         "number": 1000,
         "repo": "FalkorDB"
@@ -89,7 +89,7 @@
       "name": "conceptMatch",
       "ok": true,
       "rows": 1,
-      "ms": 68,
+      "ms": 65,
       "params": {
         "text": "vector index"
       },
@@ -107,7 +107,7 @@
       "name": "details",
       "ok": true,
       "rows": 1,
-      "ms": 70,
+      "ms": 65,
       "params": {
         "key": "pr:FalkorDB/FalkorDB#1461"
       },
@@ -120,6 +120,7 @@
         ],
         "props": {
           "additions": 154,
+          "author": "swilly22",
           "baseRef": "master",
           "changedFiles": 3,
           "closedAt": 1765957508,
@@ -176,7 +177,7 @@
       "name": "expand",
       "ok": true,
       "rows": 10,
-      "ms": 89,
+      "ms": 121,
       "params": {
         "key": "person:swilly22",
         "types": [
@@ -201,11 +202,11 @@
       "name": "whoKnowsArea",
       "ok": true,
       "rows": 10,
-      "ms": 69,
+      "ms": 67,
       "params": {
         "term": "src/index",
         "repo": "FalkorDB",
-        "now": 1792045233
+        "now": 1792046765
       },
       "first": {
         "key": "person:swilly22",
@@ -215,18 +216,18 @@
         "authored": 17,
         "reviewed": 12,
         "daysSinceLast": 0,
-        "score": 45.8758389061985
+        "score": 45.8713199810667
       }
     },
     {
       "name": "whoKnowsConcept",
       "ok": true,
       "rows": 10,
-      "ms": 108,
+      "ms": 104,
       "params": {
         "concept": "concept:vector-index",
         "repo": null,
-        "now": 1792045233
+        "now": 1792046765
       },
       "first": {
         "key": "person:AviAvni",
@@ -234,7 +235,7 @@
         "area": "concept:vector-index",
         "prs": 17,
         "daysSinceLast": 3,
-        "score": 26.4846126798603,
+        "score": 26.4820038560284,
         "sample": [
           "pr:FalkorDB/FalkorDB#1374",
           "pr:FalkorDB/FalkorDB#765",
@@ -246,7 +247,7 @@
       "name": "declaredOwners",
       "ok": true,
       "rows": 0,
-      "ms": 69,
+      "ms": 65,
       "params": {
         "areas": [
           "dir:FalkorDB/FalkorDB:/",
@@ -259,7 +260,7 @@
       "name": "traceIssue",
       "ok": true,
       "rows": 1,
-      "ms": 69,
+      "ms": 66,
       "params": {
         "key": "issue:FalkorDB/FalkorDB#1462"
       },
@@ -282,7 +283,7 @@
       "name": "tracePr",
       "ok": true,
       "rows": 1,
-      "ms": 69,
+      "ms": 65,
       "params": {
         "key": "pr:FalkorDB/FalkorDB#1461"
       },
@@ -325,7 +326,7 @@
       "name": "references",
       "ok": true,
       "rows": 3,
-      "ms": 70,
+      "ms": 68,
       "params": {
         "key": "issue:FalkorDB/FalkorDB#687"
       },
@@ -343,7 +344,7 @@
       "name": "connect",
       "ok": true,
       "rows": 3,
-      "ms": 85,
+      "ms": 82,
       "params": {
         "a": "pr:FalkorDB/falkordb-browser#1918",
         "b": "person:swilly22"
@@ -364,7 +365,7 @@
       "name": "impactOpenPrs",
       "ok": true,
       "rows": 15,
-      "ms": 72,
+      "ms": 67,
       "params": {
         "term": "src/index",
         "repo": "FalkorDB"
@@ -381,7 +382,7 @@
       "name": "impactOpenIssues",
       "ok": true,
       "rows": 10,
-      "ms": 73,
+      "ms": 69,
       "params": {
         "term": "src/index",
         "repo": "FalkorDB"
@@ -397,7 +398,7 @@
       "name": "coChanges",
       "ok": true,
       "rows": 8,
-      "ms": 68,
+      "ms": 70,
       "params": {
         "term": "src/index",
         "repo": "FalkorDB"
@@ -413,7 +414,7 @@
       "name": "activity.AUTHORED",
       "ok": true,
       "rows": 5,
-      "ms": 73,
+      "ms": 72,
       "params": {
         "repo": "falkordb-browser",
         "since": 1735689600,
@@ -436,7 +437,7 @@
       "name": "activity.REVIEWED",
       "ok": true,
       "rows": 5,
-      "ms": 76,
+      "ms": 91,
       "params": {
         "repo": "falkordb-ts",
         "since": 1735689600,
@@ -458,7 +459,7 @@
       "name": "activity.MERGED",
       "ok": true,
       "rows": 5,
-      "ms": 83,
+      "ms": 80,
       "params": {
         "repo": "FalkorDB",
         "since": 0,
@@ -492,9 +493,9 @@
         "person": "gkorland",
         "n": 1937,
         "sample": [
-          "issue:FalkorDB/FalkorDB#93",
-          "issue:FalkorDB/FalkorDB#92",
-          "issue:FalkorDB/FalkorDB#89"
+          "pr:FalkorDB/FalkorDB#769",
+          "pr:FalkorDB/FalkorDB#719",
+          "pr:FalkorDB/FalkorDB#706"
         ]
       }
     },
@@ -502,7 +503,7 @@
       "name": "pageRankReviewers",
       "ok": true,
       "rows": 10,
-      "ms": 69,
+      "ms": 67,
       "params": {},
       "first": {
         "key": "person:AviAvni",
@@ -514,12 +515,12 @@
       "name": "betweennessBridges",
       "ok": true,
       "rows": 10,
-      "ms": 74,
+      "ms": 73,
       "params": {},
       "first": {
-        "key": "person:barakb",
-        "person": "barakb",
-        "score": 91.3969239874931,
+        "key": "person:gkorland",
+        "person": "gkorland",
+        "score": 91.7599509931672,
         "repos": [
           "FalkorDB-MCPServer",
           "falkordb-ts",
@@ -534,7 +535,7 @@
       "name": "subsystems",
       "ok": true,
       "rows": 8,
-      "ms": 735,
+      "ms": 715,
       "params": {},
       "first": {
         "communityId": 26049,
@@ -565,7 +566,7 @@
       "name": "verifyPath",
       "ok": true,
       "rows": 1,
-      "ms": 71,
+      "ms": 69,
       "params": {
         "entry": "concept:vector-index",
         "cited": "person:swilly22"
@@ -574,12 +575,12 @@
         "hops": 2,
         "keys": [
           "concept:vector-index",
-          "pr:FalkorDB/FalkorDB#2581",
+          "issue:FalkorDB/FalkorDB#898",
           "person:swilly22"
         ],
         "rels": [
           "MENTIONS",
-          "MERGED"
+          "COMMENTED_ON"
         ]
       }
     },
@@ -587,7 +588,7 @@
       "name": "neighbourhood",
       "ok": true,
       "rows": 40,
-      "ms": 93,
+      "ms": 100,
       "params": {
         "key": "repo:FalkorDB/falkordb-ts"
       },
@@ -623,17 +624,20 @@
       "name": "vectorRag",
       "ok": true,
       "rows": 8,
-      "ms": 70,
+      "ms": 67,
       "params": {
         "vec": "[256-dim vector]",
         "k": 8
       },
       "first": {
-        "chunk": "chunk:pr:FalkorDB/falkordb-ts#185:0",
-        "text": "Fix #184 add vector parser. Summary by CodeRabbit - New Features - Introduced support for a new vector data type ( VECTORF32 ) in graph queries, enhancing data representation capabilities. - Tests - Added new test cases to validate the functionality of querying vector values in the Graph class.",
-        "key": "pr:FalkorDB/falkordb-ts#185",
-        "name": "Fix #184 add vector parser",
-        "score": 0.425468385219574
+        "chunk": "chunk:pr:FalkorDB/FalkorDB#3:0",
+        "text": "Add vector index capabilities. Add vector index capabilities                              ",
+        "key": "pr:FalkorDB/FalkorDB#3",
+        "name": "Add vector index capabilities",
+        "author": "swilly22",
+        "state": "CLOSED",
+        "createdAt": 1690284264,
+        "score": 0.999999940395355
       }
     }
   ]

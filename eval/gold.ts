@@ -50,7 +50,8 @@ const push = (category: string, q: Omit<Question, "id" | "category"> & Partial<Q
     if (used.has(d.repo) && used.size < data.length) continue;
     used.add(d.repo);
     push("lookup", {
-      question: `Who opened pull request #${p.number} in the ${d.repo} repository, and what was it about?`,
+      // Title-first phrasing: retrieval recall for the vector baseline is much better than with a question-first template.
+      question: `"${p.title.replace(/"/g, "'")}" (${d.repo}): who opened this pull request and what is its number?`,
       gold: [p.author.login.toLowerCase(), `#${p.number}`],
       goldKeys: [`pr:${ORG}/${d.repo}#${p.number}`, `person:${p.author.login}`],
       detail: p.title,

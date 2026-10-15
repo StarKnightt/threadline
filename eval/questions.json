@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-10-15T06:30:52.445Z",
+  "generatedAt": "2026-10-15T06:46:01.242Z",
   "since": "2023-01-01",
   "questions": [
     {
-      "question": "Who opened pull request #152 in the falkordb-browser repository, and what was it about?",
+      "question": "\"fix #14 add monitor view\" (falkordb-browser): who opened this pull request and what is its number?",
       "gold": [
         "anchel123",
         "#152"
@@ -17,7 +17,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #2628 in the FalkorDB repository, and what was it about?",
+      "question": "\"perf(runtime): evaluate whole expression trees column at a time\" (FalkorDB): who opened this pull request and what is its number?",
       "gold": [
         "aviavni",
         "#2628"
@@ -31,7 +31,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #9 in the falkordb-ts repository, and what was it about?",
+      "question": "\"fix #5 add support for GRAPN.CONSTRAINT\" (falkordb-ts): who opened this pull request and what is its number?",
       "gold": [
         "gkorland",
         "#9"
@@ -45,7 +45,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #176 in the GraphRAG-SDK repository, and what was it about?",
+      "question": "\"feat: Add CreateOntologyStep import to ontology.py\" (GraphRAG-SDK): who opened this pull request and what is its number?",
       "gold": [
         "aryan757",
         "#176"
@@ -59,7 +59,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #53 in the FalkorDB-MCPServer repository, and what was it about?",
+      "question": "\"Configure Dependabot for npm and GitHub Actions\" (FalkorDB-MCPServer): who opened this pull request and what is its number?",
       "gold": [
         "gkorland",
         "#53"
@@ -73,7 +73,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #107 in the QueryWeaver repository, and what was it about?",
+      "question": "\"Design\" (QueryWeaver): who opened this pull request and what is its number?",
       "gold": [
         "gkorland",
         "#107"
@@ -87,7 +87,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #2042 in the falkordb-browser repository, and what was it about?",
+      "question": "\"fix: address AI review findings on relationship styling\" (falkordb-browser): who opened this pull request and what is its number?",
       "gold": [
         "anchel123",
         "#2042"
@@ -101,7 +101,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #2845 in the FalkorDB repository, and what was it about?",
+      "question": "\"fix: give every CALL {} body its entry projection as a record boundary\" (FalkorDB): who opened this pull request and what is its number?",
       "gold": [
         "aviavni",
         "#2845"
@@ -115,7 +115,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #736 in the QueryWeaver repository, and what was it about?",
+      "question": "\"feat: verify email addresses before creating an account\" (QueryWeaver): who opened this pull request and what is its number?",
       "gold": [
         "anchel123",
         "#736"
@@ -129,7 +129,7 @@
       "category": "lookup"
     },
     {
-      "question": "Who opened pull request #3094 in the FalkorDB repository, and what was it about?",
+      "question": "\"fix: validate index OPTIONS like C (vector dimension/similarityFunction required, case-insensitive metric, unknown fulltext keys rejected)\" (FalkorDB): who opened this pull request and what is its number?",
       "gold": [
         "aviavni",
         "#3094"

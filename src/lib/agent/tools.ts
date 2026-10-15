@@ -36,7 +36,7 @@ function compact(rows: Row[], max = 12): Row[] {
     if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).filter(([, x]) => x !== null && x !== undefined).map(([k, x]) => [k, clip(x)]));
     return v;
   };
-  return rows.slice(0, max).map((r) => clip(r) as Row);
+  return rows.slice(0, max).map(({ draft, ...r }) => ({ ...(clip(r) as Row), ...(typeof draft === "string" ? { draft } : {}) }));
 }
 
 const tsToDate = (s: unknown) => (typeof s === "number" && s > 1e9 ? new Date(s * 1000).toISOString().slice(0, 10) : s);
@@ -102,6 +102,8 @@ const ftText = (s: string) =>
     .slice(0, 8)
     .join(" | ");
 const STOP = new Set("the and for who what which with that this from into have has was were are about most recently should when why how did does any last month year code change changes review".split(" "));
+
+const shortRef = (k: string) => k.replace(/^(?:pr|issue):FalkorDB\//, "").replace(/^(?:pr|issue):/, "");
 
 const repoArg = z.string().optional().describe("Repository short name, for example FalkorDB, falkordb-browser, QueryWeaver, GraphRAG-SDK, falkordb-ts, FalkorDB-MCPServer");
 
@@ -333,6 +335,42 @@ export function makeTools(ctx: ToolCtx) {
           const cy = kind === "reviewers" ? Q.pageRankReviewers : kind === "bridges" ? Q.betweennessBridges : Q.subsystems;
           const r = await run(cy, {});
           return { runs: [r], rows: r.rows };
+        }),
+    }),
+
+    draft_triage: tool({
+      description:
+        "Action: draft a triage comment for an issue key: likely duplicates (vector similarity), probable owners (similar threads -> their fixing PRs -> touched directories -> KNOWS), and suggested labels. Returns ready-to-paste markdown. Nothing is posted anywhere.",
+      inputSchema: z.object({ key: z.string().describe("issue:... key") }),
+      execute: async ({ key }) =>
+        step(ctx, "draft_triage", { key }, async () => {
+          const runs: Run[] = [];
+          const i = await run(Q.triageIssue, { key });
+          runs.push({ ...i, rows: i.rows.map(({ e: _e, ...r }) => r) }); // eslint-disable-line @typescript-eslint/no-unused-vars
+          const issue = i.rows[0];
+          if (!issue) return { runs, rows: [], note: "Issue not found." };
+          const vec = (issue.e as number[] | null) ?? (await embedQuestion(`${issue.title} ${issue.summary ?? ""}`));
+          const sim = await run(Q.triageSimilar, { vec, key });
+          runs.push(sim);
+          const similar = sim.rows.map((r) => r.key as string);
+          const own = await run(Q.triageOwners, { similar });
+          runs.push(own);
+          const lab = await run(Q.triageLabels, { similar });
+          runs.push(lab);
+          const owners = [...new Map(own.rows.map((r) => [r.person, r])).values()].slice(0, 3);
+          const md = [
+            `**Triage draft for ${shortRef(key)}: ${issue.title}**`,
+            "",
+            similar.length ? "Possibly related or duplicate:" : "No similar threads found.",
+            ...sim.rows.slice(0, 4).map((r) => `- ${shortRef(r.key as string)} ${r.name} (${String(r.state).toLowerCase()}, similarity ${(r.similarity as number).toFixed(2)})`),
+            "",
+            owners.length ? `Suggested reviewers, from who changed the same code when similar issues were fixed: ${owners.map((o) => `@${o.person} (${o.path})`).join(", ")}` : "No owner signal in the graph.",
+            lab.rows.length ? `Suggested labels: ${lab.rows.map((l) => `\`${l.label}\``).join(", ")}` : "",
+            "",
+            "_Drafted by Threadline from the FalkorDB graph; every line links back to a graph node._",
+          ].filter((l, idx, a) => !(l === "" && a[idx - 1] === ""));
+          const edges: TraceEdge[] = [...similar.slice(0, 4).map((s) => [key, "SIMILAR_TO", s] as TraceEdge), ...owners.map((o) => [o.key as string, "KNOWS", o.area as string] as TraceEdge)];
+          return { runs, rows: [{ key, title: issue.title, draft: md.join("\n") }, ...sim.rows, ...owners, ...lab.rows], edges };
         }),
     }),
 

@@ -26,6 +26,7 @@ function systemPrompt(now: number, mem?: MemoryContext) {
     "- Who did the most X in a repo, year or directory: activity (metric AUTHORED with kind pr or issue, REVIEWED, MERGED, COMMENTED_ON; since/until as YYYY-MM-DD; area for a directory path).",
     "- Cross-repo references: trace gives each referencing thread with a crossRepo flag; only list rows where crossRepo is true when asked about other repositories.",
     "- How two things relate: find_entities for each, then connect. Org-wide influence: rank.",
+    "- Triage an issue or draft a comment for it: find_entities with number and repo, then draft_triage; include the draft in the answer.",
     "Rules:",
     "- Prefer the typed tools. Use cypher_readonly only when nothing else fits.",
     "- Use at most 5 tool calls, then answer.",

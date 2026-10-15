@@ -24,6 +24,7 @@ const TOOL_NAMES: Record<string, string> = {
   rank: "Graph algorithm",
   cypher_readonly: "Free-form Cypher",
   verify_citations: "Verifier: path check",
+  draft_triage: "Action: draft triage",
   vector_search: "Vector search",
 };
 
@@ -64,6 +65,15 @@ function StepCard({ s, active, onClick }: { s: TraceStep; active: boolean; onCli
         </div>
       )}
       {s.note && <div className={`mt-1.5 text-[11.5px] ${verifier ? "text-[#ffd166]/90" : "text-slate-400"}`}>{s.note}</div>}
+      {typeof s.rows[0]?.draft === "string" && (
+        <div className="mt-2 rounded-md border border-emerald-400/20 bg-emerald-400/[0.04] p-2.5">
+          <div className="mb-1 flex items-center text-[10.5px] uppercase tracking-wider text-emerald-300/80">
+            Triage draft (not posted)
+            <button onClick={() => navigator.clipboard.writeText(s.rows[0].draft as string)} className="ml-auto normal-case tracking-normal text-emerald-300 hover:text-white">Copy</button>
+          </div>
+          <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-slate-300">{s.rows[0].draft as string}</pre>
+        </div>
+      )}
       {s.error && <div className="mt-1.5 text-[11.5px] text-rose-300">Error: {s.error}</div>}
       {s.queries.length > 0 && (
         <div className="mt-2">

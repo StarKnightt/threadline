@@ -1,3 +1,4 @@
+// FalkorDB vector scores are cosine distances (lower is closer); queries convert them to similarity = 1 - distance.
 // The Cypher the agent tools run. Each entry is documented in docs/CYPHER.md under the same id.
 // All user-supplied values are passed as parameters; nothing is string-concatenated into Cypher.
 
@@ -7,8 +8,8 @@ export const Q = {
   /** Q1: entry points by meaning. Vector search over chunks, mapped back to the thread or doc they belong to. */
   vectorEntry: `CALL db.idx.vector.queryNodes('Chunk', 'embedding', $k, vecf32($vec)) YIELD node, score
 MATCH (node)-[:PART_OF]->(n:Entity)
-RETURN n.key AS key, labels(n) AS labels, ${NAME} AS name, n.repo AS repo, max(score) AS score
-ORDER BY score DESC LIMIT $limit`,
+RETURN n.key AS key, labels(n) AS labels, ${NAME} AS name, n.repo AS repo, 1 - min(score) AS similarity
+ORDER BY similarity DESC LIMIT $limit`,
 
   /** Q2: entry points by name. Full-text index over titles, names, paths, logins and tags. */
   fulltextEntry: `CALL db.idx.fulltext.queryNodes('Entity', $text) YIELD node, score
@@ -191,9 +192,39 @@ OPTIONAL MATCH (n1)-[r2]-(n2:Entity) WHERE n2 <> s
 WITH s, r1, n1, collect({r: type(r2), k: n2.key, out: id(startNode(r2)) = id(n1)})[0..4] AS hop2
 RETURN n1.key AS key, type(r1) AS rel, id(startNode(r1)) = id(s) AS outgoing, hop2`,
 
+  /** Triage (action): the issue itself and its first chunk's embedding. */
+  triageIssue: `MATCH (i:Issue {key: $key})
+OPTIONAL MATCH (i)-[:HAS_LABEL]->(l:Label)
+OPTIONAL MATCH (c:Chunk)-[:PART_OF]->(i)
+WITH i, collect(DISTINCT l.name) AS labels, collect(c)[0] AS c
+RETURN i.key AS key, i.title AS title, i.state AS state, i.summary AS summary, labels, c.embedding AS e`,
+
+  /** Triage: likely duplicates or related threads by meaning (excluding the issue itself). */
+  triageSimilar: `CALL db.idx.vector.queryNodes('Chunk', 'embedding', 24, vecf32($vec)) YIELD node, score
+MATCH (node)-[:PART_OF]->(t:Thread)
+WHERE t.key <> $key
+RETURN t.key AS key, t.title AS name, t.state AS state, 1 - min(score) AS similarity
+ORDER BY similarity DESC LIMIT 6`,
+
+  /** Triage: probable owners. Similar threads -> the PRs that fixed them -> directories touched -> who KNOWS them. */
+  triageOwners: `MATCH (t:Thread) WHERE t.key IN $similar
+OPTIONAL MATCH (fix:PullRequest)-[:CLOSES]->(t)
+WITH CASE WHEN fix IS NOT NULL THEN fix WHEN t:PullRequest THEN t ELSE null END AS p
+WITH p WHERE p IS NOT NULL
+MATCH (p)-[:TOUCHED]->(:File)-[:IN_DIR]->(d:Directory)
+WITH d, count(DISTINCT p) AS n ORDER BY n DESC LIMIT 3
+MATCH (person:Person)-[k:KNOWS]->(d)
+WHERE person.isBot = false
+RETURN person.key AS key, person.login AS person, d.key AS area, d.path AS path, k.authored AS authored, k.reviewed AS reviewed
+ORDER BY k.authored * 2 + k.reviewed DESC LIMIT 6`,
+
+  /** Triage: labels used on the similar threads. */
+  triageLabels: `MATCH (t:Thread)-[:HAS_LABEL]->(l:Label) WHERE t.key IN $similar
+RETURN l.name AS label, count(t) AS n ORDER BY n DESC LIMIT 4`,
+
   /** Vector RAG baseline (same index, no graph traversal): top chunks with their text. */
   vectorRag: `CALL db.idx.vector.queryNodes('Chunk', 'embedding', $k, vecf32($vec)) YIELD node, score
 MATCH (node)-[:PART_OF]->(n:Entity)
-RETURN node.key AS chunk, node.text AS text, n.key AS key, ${NAME} AS name, n.author AS author, n.state AS state, n.createdAt AS createdAt, score
+RETURN node.key AS chunk, node.text AS text, n.key AS key, ${NAME} AS name, n.author AS author, n.state AS state, n.createdAt AS createdAt, 1 - score AS score
 ORDER BY score DESC`,
 } as const;

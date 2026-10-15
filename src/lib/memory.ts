@@ -46,9 +46,9 @@ ORDER BY at DESC LIMIT 20`,
 
   /** Q14: procedural memory. Closest verified playbook for a new question (shared across users). */
   recallPlaybook: `CALL db.idx.vector.queryNodes('Playbook', 'embedding', 3, vecf32($vec)) YIELD node, score
-WITH node, score WHERE score > 0.86 AND node.successes >= 1
-RETURN node.questionType AS questionType, node.toolSequence AS toolSequence, node.successes AS successes, score
-ORDER BY score DESC LIMIT 1`,
+WITH node, 1 - score AS similarity WHERE similarity > 0.86 AND node.successes >= 1
+RETURN node.questionType AS questionType, node.toolSequence AS toolSequence, node.successes AS successes, similarity
+ORDER BY similarity DESC LIMIT 1`,
 
   /** Q16: promote a verified tool sequence to a shared playbook. */
   writePlaybook: `MERGE (p:Playbook {questionType: $qt, toolSequence: $seq})
