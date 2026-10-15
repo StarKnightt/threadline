@@ -6,7 +6,7 @@ type R = { id: string; category: string; system: "graph" | "vector"; model: stri
 const rows = readFileSync("eval/results.jsonl", "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l) as R);
 const model = process.argv[2] ?? rows[0]?.model;
 const use = rows.filter((r) => r.model === model);
-const both = new Set([...new Set(use.map((r) => r.id))].filter((id) => use.some((r) => r.id === id && r.system === "graph") && use.some((r) => r.id === id && r.system === "vector")));
+const both = new Set([...new Set(use.map((r) => r.id))].filter((id) => { const g = use.find((r) => r.id === id && r.system === "graph"); const v = use.find((r) => r.id === id && r.system === "vector"); return g && v && g.model === v.model; }));
 const paired = use.filter((r) => both.has(r.id));
 
 const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
@@ -38,6 +38,7 @@ const summary = {
   generatedAt: new Date().toISOString(),
   pairedQuestions: both.size,
   overall: { graph: stats(paired.filter((r) => r.system === "graph")), vector: stats(paired.filter((r) => r.system === "vector")) },
+  models: Object.fromEntries([...new Set(paired.map((r) => r.model))].map((m) => [m, { graph: stats(paired.filter((r) => r.model === m && r.system === "graph")), vector: stats(paired.filter((r) => r.model === m && r.system === "vector")) }])),
   categories: Object.fromEntries(
     categories.map((c) => [c, { graph: stats(paired.filter((r) => r.category === c && r.system === "graph")), vector: stats(paired.filter((r) => r.category === c && r.system === "vector")) }]),
   ),
