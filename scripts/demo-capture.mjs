@@ -129,6 +129,12 @@ if (live) {
     await page.click("button:has-text('Ask')");
     await page.waitForSelector("text=/citations verified|no node citations/", { timeout: 120000 });
     await sleep(5000);
+    // Printed so the answer can be checked against the graph before the clip is kept.
+    const id = page.url().split("/t/")[1];
+    if (id) {
+      const t = await (await fetch(`${base}/api/trace/${id}`)).json().catch(() => null);
+      console.log(`11 trace ${page.url()}  model=${t?.model ?? "?"}\n${t?.answer ?? "(trace not readable)"}`);
+    }
   });
 
   await scene("12-memory", async (page) => {

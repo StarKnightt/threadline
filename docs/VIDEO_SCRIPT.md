@@ -24,4 +24,5 @@ End card text: `threadline-graph.vercel.app` · `github.com/StarKnightt/threadli
 
 - Record the voiceover first, then trim clips to fit. Replay clips can be slowed to 90 percent if a block runs long.
 - If a live clip shows a rate-limit message, rerun it a minute later; the per-minute token limit resets quickly.
+- `11-live-question` (issue #2048) was answered by OpenAI `gpt-5.4-mini`, not by Groq or the production fallback, and the clip shows that model name. Every Groq model was capped at recording time, and two production takes on `gpt-5.6-luna` both credited the unmerged PR #2069 with release v4.20.7. The kept take was recorded from a local server on the same FalkorDB graph with `OPENAI_FALLBACK_MODEL=gpt-5.4-mini` ([trace](https://threadline-graph.vercel.app/t/705964c5-19c)). Its answer, PR #2306 shipped in v4.20.7, matches the graph; it leaves out PR #2279, which links to the issue only by keyword and shipped in v6.0.0. If narrating it, do not call it a production run.
 - Upload to YouTube or Vimeo as public or unlisted and paste the link into the README and the submission form.

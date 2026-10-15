@@ -11,9 +11,10 @@ export const PAID_MAX_OUTPUT_TOKENS = 2000;
 export const PAID_RUNS_PER_DAY = Number(process.env.OPENAI_DAILY_RUNS ?? 30);
 export const PAID_RUNS_PER_MONTH = Number(process.env.OPENAI_MONTHLY_RUNS ?? 100);
 
-/** USD per 1M tokens: input, cached input, output. */
+/** USD per 1M tokens on the Standard tier: input, cached input, output. */
 const PRICES: Record<string, [number, number, number]> = {
-  "gpt-5.6-luna": [0.1, 0.01, 0.6],
+  "gpt-5.6-luna": [0.2, 0.02, 1.2],
+  "gpt-5.4-mini": [0.75, 0.075, 4.5],
   "gpt-5-nano": [0.05, 0.005, 0.4],
   "gpt-4.1-nano": [0.1, 0.025, 0.4],
 };

@@ -6,7 +6,18 @@
   "cached": 160953,
   "output": 6352,
   "embedTokens": 809,
-  "usd": 0.01223101,
+  "usd": 0.024446,
   "rows": 58,
-  "updatedAt": "2026-10-15T09:58:52.962Z"
+  "updatedAt": "2026-10-15T09:58:52.962Z",
+  "usdUpperBoundWithCacheWrites": 0.027843,
+  "pricesPerM": {
+    "input": 0.2,
+    "cachedInput": 0.02,
+    "cacheWrites": 0.25,
+    "output": 1.2,
+    "embedding": 0.02,
+    "tier": "Standard",
+    "source": "https://developers.openai.com/api/docs/pricing"
+  },
+  "note": "usd prices uncached input at the input rate; the upper bound prices all uncached input at the cache-write rate. Earlier ledger values used the Batch rate by mistake."
 }
