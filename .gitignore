@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+!.env.example
+
+# ingestion caches (raw GitHub responses, embeddings)
+/data/raw/
+/data/cache/
+/.playwright-mcp/
