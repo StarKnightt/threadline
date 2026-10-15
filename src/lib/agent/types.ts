@@ -36,6 +36,8 @@ export type Trace = {
   ms: number;
   at: number;
   showcase?: boolean;
+  /** Showcase pairs: the vector-baseline trace for the same question. */
+  pairId?: string;
   /** Vector baseline only: retrieved chunks with similarity scores. */
   chunks?: { chunk: string; key: string; name: string; score: number; text: string }[];
 };

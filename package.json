@@ -15,7 +15,8 @@
     "eval:gold": "tsx eval/gold.ts",
     "eval:run": "tsx --conditions=react-server eval/run.ts",
     "verify:cypher": "tsx scripts/verify-cypher.ts",
-    "ask": "tsx --conditions=react-server scripts/ask.ts"
+    "ask": "tsx --conditions=react-server scripts/ask.ts",
+    "layout": "tsx scripts/layout.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.61",

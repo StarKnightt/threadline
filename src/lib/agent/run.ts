@@ -102,7 +102,7 @@ export async function verify(steps: TraceStep[], answer: string, emit: (e: Recor
     emit({ type: "verify", ...c });
   }
   const v: Verification = { entry, citations, verified: citations.filter((c) => c.ok).length, total: citations.length };
-  steps.push({
+  const verifierStep: TraceStep = {
     step: steps.length + 1,
     tool: "verify_citations",
     agent: "verifier",
@@ -113,7 +113,9 @@ export async function verify(steps: TraceStep[], answer: string, emit: (e: Recor
     edges: citations.flatMap((c) => c.path),
     rows: citations.map((c) => ({ key: c.key, observed: c.observed, hops: c.hops, ok: c.ok })),
     note: `${v.verified} of ${v.total} citations verified`,
-  });
+  };
+  steps.push(verifierStep);
+  emit({ type: "step_result", ...verifierStep });
   return v;
 }
 
