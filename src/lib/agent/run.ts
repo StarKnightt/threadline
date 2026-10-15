@@ -1,14 +1,13 @@
 import "server-only";
-import { createGroq } from "@ai-sdk/groq";
-import { generateText, isStepCount, type ModelMessage } from "ai";
+import { isStepCount, type ModelMessage } from "ai";
 import { Q } from "../cypher/catalogue";
 import { BRAIN, query } from "../falkor";
 import { embedQuestion } from "../embed";
+import { generateWithFallback, type PaidRun } from "./llm";
 import { KEY_RE, makeTools, type ToolCtx } from "./tools";
 import type { Citation, Trace, TraceEdge, TraceStep, Verification } from "./types";
 
-const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
-export const MODELS = (process.env.TL_MODELS ?? "openai/gpt-oss-120b,openai/gpt-oss-20b,qwen/qwen3.8-27b").split(",");
+export { MODELS } from "./llm";
 
 export type MemoryContext = { facts: string[]; previous?: { question: string; refs: string[] }; playbook?: { questionType: string; toolSequence: string } };
 
@@ -38,27 +37,6 @@ function systemPrompt(now: number, mem?: MemoryContext) {
   if (mem?.previous) lines.push(`Previous question in this session: "${mem.previous.question}" (it used ${mem.previous.refs.slice(0, 6).join(", ")}). Resolve follow-ups like "same for ..." against it.`);
   if (mem?.playbook) lines.push(`A similar ${mem.playbook.questionType} question was answered and verified before with this tool sequence: ${mem.playbook.toolSequence}. Start from that plan.`);
   return lines.join("\n");
-}
-
-function isRateLimit(e: unknown) {
-  const m = String((e as Error)?.message ?? e);
-  return /rate.?limit|429|tokens per (day|minute)|TPD|TPM|quota|over capacity|503/i.test(m);
-}
-
-async function generateWithFallback(opts: Omit<Parameters<typeof generateText>[0], "model">, models = MODELS) {
-  let last: unknown;
-  for (const id of models) {
-    try {
-      // gpt-oss models take low reasoning effort; Qwen3 supports turning thinking off entirely.
-      const reasoningEffort = id.startsWith("qwen/") ? "none" : "low";
-      const res = await generateText({ ...opts, maxRetries: 1, model: groq(id), providerOptions: { groq: { reasoningEffort, parallelToolCalls: false } } } as Parameters<typeof generateText>[0]);
-      return { res, model: id };
-    } catch (e) {
-      last = e;
-      if (!isRateLimit(e)) throw e;
-    }
-  }
-  throw last;
 }
 
 export function citedKeys(answer: string) {
@@ -134,13 +112,13 @@ export async function verify(steps: TraceStep[], answer: string, emit: (e: Recor
   return v;
 }
 
-export async function runGraphAgent(question: string, emit: (e: Record<string, unknown>) => void, mem?: MemoryContext, opts: { handoff?: boolean; models?: string[] } = {}): Promise<Omit<Trace, "id" | "at">> {
+export async function runGraphAgent(question: string, emit: (e: Record<string, unknown>) => void, mem?: MemoryContext, opts: { handoff?: boolean; models?: string[]; paid?: PaidRun } = {}): Promise<Omit<Trace, "id" | "at">> {
   const t0 = Date.now();
   const now = Math.floor(Date.now() / 1000);
   const ctx: ToolCtx = { now, steps: [], emit };
   const tools = makeTools(ctx);
   const messages: ModelMessage[] = [{ role: "user", content: question }];
-  const { res, model } = await generateWithFallback({ system: systemPrompt(now, mem), messages, tools, stopWhen: isStepCount(6), maxOutputTokens: 1400, temperature: 0 }, opts.models);
+  const { res, model } = await generateWithFallback({ system: systemPrompt(now, mem), messages, tools, stopWhen: isStepCount(6), maxOutputTokens: 1400, temperature: 0 }, opts.models, opts.paid);
   let answer = res.text.trim();
   let tokens = res.usage?.totalTokens ?? 0;
   if (!answer) answer = "I could not finish an answer within the step budget. The trace above shows what the graph returned.";
@@ -163,6 +141,7 @@ export async function runGraphAgent(question: string, emit: (e: Record<string, u
           temperature: 0,
         },
         opts.models,
+        opts.paid,
       );
       tokens += fix.res.usage?.totalTokens ?? 0;
       if (fix.res.text.trim()) {
@@ -180,7 +159,7 @@ export async function runGraphAgent(question: string, emit: (e: Record<string, u
   return { question, mode: "graph", answer, steps: ctx.steps, verification, model, tokens, ms: Date.now() - t0 };
 }
 
-export async function runVectorBaseline(question: string, emit: (e: Record<string, unknown>) => void, opts: { models?: string[]; k?: number } = {}): Promise<Omit<Trace, "id" | "at">> {
+export async function runVectorBaseline(question: string, emit: (e: Record<string, unknown>) => void, opts: { models?: string[]; k?: number; paid?: PaidRun } = {}): Promise<Omit<Trace, "id" | "at">> {
   const t0 = Date.now();
   const vec = await embedQuestion(question);
   const t = Date.now();
@@ -212,6 +191,7 @@ export async function runVectorBaseline(question: string, emit: (e: Record<strin
       temperature: 0,
     },
     opts.models,
+    opts.paid,
   );
   const answer = res.text.trim();
   emit({ type: "answer", text: answer, model });

@@ -136,6 +136,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
   const [live, setLive] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [capped, setCapped] = useState(false);
   const [memory, setMemory] = useState<Memory | null>(null);
   const [memOpen, setMemOpen] = useState(false);
   const gp = usePlayback(graph, live);
@@ -188,6 +189,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
     setBusy(true);
     setLive(true);
     setError(null);
+    setCapped(false);
     setAsked(q);
     setGraph(emptyLane("graph"));
     setVector(split ? emptyLane("vector") : null);
@@ -212,7 +214,10 @@ export function Theatre({ traceId }: { traceId?: string }) {
           const line = p.replace(/^data: /, "");
           if (!line.trim()) continue;
           const e = JSON.parse(line) as Record<string, unknown>;
-          if (e.type === "error") setError(e.message as string);
+          if (e.type === "error") {
+            setError(e.message as string);
+            setCapped(!!e.capped);
+          }
           if (e.lane === "vector") setVector((l) => reduce(l ?? emptyLane("vector"), e));
           else setGraph((l) => reduce(l ?? emptyLane("graph"), e));
           if (e.type === "done" && e.lane === "graph") window.history.replaceState(null, "", `/t/${e.traceId}`);

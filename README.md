@@ -31,21 +31,19 @@
 ## Why a graph
 
 <!-- EVAL:START -->
-Method: 60 questions in six categories, generated from templates over the raw GitHub JSON. Gold answers are computed by `eval/gold.ts` from that JSON without FalkorDB, so the graph never grades itself. Both systems use the same model, the same 256-dimension embeddings and the same FalkorDB vector index; scores are set-based F1 over each answer's final ANSWER line.
+**Interim results (31 of 60 questions; the run continues as daily token caps reset).** Gold answers are computed from the raw GitHub JSON by `eval/gold.ts`, without FalkorDB. Both systems answer each question with the same model (questions rotate across qwen/qwen3.8-27b, openai/gpt-oss-120b), the same 256-dim embeddings and the same FalkorDB vector index.
 
-Run in progress: 31 of 60 questions answered by both systems so far (the rest resume as each model's daily Groq cap refills). These numbers cover finished pairs only. Models: qwen/qwen3.8-27b (7 pairs), openai/gpt-oss-120b (24 pairs).
-
-| Category | Pairs | Graph agent F1 | Vector RAG F1 |
+| Category | n | Graph agent F1 | Vector RAG F1 |
 |---|---|---|---|
 | Single-hop lookup (control) | 7 | 1.00 | 0.43 |
-| Expertise (PR to file to directory) | 7 | 0.76 | 0.00 |
-| Decision trace (issue to PR to release) | 5 | 0.80 | 0.00 |
+| Expertise | 7 | 0.76 | 0.00 |
+| Decision trace | 5 | 0.80 | 0.00 |
 | Cross-repo connection | 4 | 1.00 | 0.00 |
-| Impact (open PRs under a directory) | 4 | 0.50 | 0.00 |
-| Aggregation (top reviewers or openers) | 4 | 1.00 | 0.00 |
-| **All** | **31** | **0.85** | **0.10** |
+| Impact | 4 | 0.50 | 0.00 |
+| Aggregation | 4 | 1.00 | 0.00 |
+| **Overall** | **31** | **0.85** | **0.10** |
 
-The graph agent used about 5,721 tokens per answer against 1,533 for the baseline. 96 percent of the graph agent's citations were verified by a graph path. The vector baseline does best on single-hop lookup questions (F1 0.43), the control category where the answer sits in one document. Widest gap: cross-repo connection and aggregation. Every question, gold answer, raw answer and score is in [`eval/`](eval/) and on [/eval](https://threadline-graph.vercel.app/eval).
+Average tokens per answer: graph agent 5721, vector RAG 1533. Median latency: graph agent 25.0 s, vector RAG 1.6 s. Vector RAG does best on the control category, where the answer sits in one document; it cannot answer questions whose answer is a join across people, files, pull requests and releases. Every question, gold answer and raw answer is in `eval/` and on [/eval](https://threadline-graph.vercel.app/eval).
 <!-- EVAL:END -->
 
 ## Graph data model

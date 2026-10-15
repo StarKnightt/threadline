@@ -1,10 +1,23 @@
 import { randomUUID } from "node:crypto";
+import { AllCappedError, isRateLimit, OPENAI_MODEL, PAID_RUNS_PER_DAY, PAID_RUNS_PER_MONTH, PaidRun, type Slot } from "@/lib/agent/llm";
 import { runGraphAgent, runVectorBaseline } from "@/lib/agent/run";
 import type { Trace } from "@/lib/agent/types";
 import { embedQuestion } from "@/lib/embed";
 import { bump, ensureShared, loadMemory, persist } from "@/lib/memory";
 
 export const maxDuration = 120;
+
+const CAPPED_MESSAGE =
+  "Today's free model capacity for live questions is used up. The recorded runs above replay full investigations instantly, with every hop and its Cypher, and need no model call. Live questions open again when the daily limits reset.";
+
+/** One paid OpenAI run per lane, counted atomically in FalkorDB (shared across instances). */
+async function claimPaidRun(): Promise<Slot> {
+  const day = await bump("openai-runs:day", 86400);
+  if (day > PAID_RUNS_PER_DAY) return { ok: false, why: `daily OpenAI budget used (${PAID_RUNS_PER_DAY} runs)` };
+  const month = await bump("openai-runs:month", 30 * 86400);
+  if (month > PAID_RUNS_PER_MONTH) return { ok: false, why: `monthly OpenAI budget used (${PAID_RUNS_PER_MONTH} runs)` };
+  return { ok: true };
+}
 
 const PER_IP = Number(process.env.ASK_PER_IP_PER_HOUR ?? 10);
 const GLOBAL = Number(process.env.ASK_GLOBAL_PER_DAY ?? 300);
@@ -37,7 +50,13 @@ export async function POST(req: Request) {
         const vec = m === "graph" ? await embedQuestion(question).catch(() => null) : null;
         const mem = m === "graph" && userId && sessionId ? await loadMemory(userId, sessionId, vec) : undefined;
         if (mem && (mem.facts.length || mem.previous || mem.playbook)) emit({ type: "memory", facts: mem.facts, previous: mem.previous?.question, playbook: mem.playbook });
-        const t = m === "graph" ? await runGraphAgent(question, emit, mem) : await runVectorBaseline(question, emit);
+        const paid = new PaidRun(claimPaidRun);
+        let t: Omit<Trace, "id" | "at">;
+        try {
+          t = m === "graph" ? await runGraphAgent(question, emit, mem, { paid }) : await runVectorBaseline(question, emit, { paid });
+        } finally {
+          if (paid.calls) console.log(`[llm] openai ${OPENAI_MODEL} ${m}: ${paid.calls} calls, ${paid.usage.input} in (${paid.usage.cached} cached) + ${paid.usage.output} out, ~$${(paid.costUsd ?? 0).toFixed(5)}`);
+        }
         const trace: Trace = { ...t, id: randomUUID().slice(0, 12), at: Math.floor(Date.now() / 1000) };
         await persist(trace, { userId: m === "graph" ? userId : undefined, sessionId, vec }).catch((e) => console.error("persist failed", e));
         emit({ type: "done", traceId: trace.id, tokens: trace.tokens, ms: trace.ms, model: trace.model });
@@ -47,7 +66,10 @@ export async function POST(req: Request) {
         else await run(mode);
       } catch (e) {
         const msg = String((e as Error).message ?? e);
-        send({ type: "error", message: /rate.?limit|429|tokens per/i.test(msg) ? "The language model is rate limited right now. Try a showcase trace, or ask again in a minute." : msg.slice(0, 200) });
+        if (e instanceof AllCappedError || isRateLimit(e)) {
+          console.warn("[llm] all providers capped:", msg.replace(/org_\w+/g, "org").slice(0, 200));
+          send({ type: "error", capped: true, message: CAPPED_MESSAGE });
+        } else send({ type: "error", message: msg.slice(0, 200) });
       } finally {
         controller.close();
       }
