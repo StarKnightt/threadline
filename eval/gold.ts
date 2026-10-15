@@ -43,7 +43,10 @@ const push = (category: string, q: Omit<Question, "id" | "category"> & Partial<Q
 
 // 1. Single-hop lookup (control): who opened a PR. Vector retrieval should do fine here.
 {
-  const pool = shuffle(data.flatMap((d) => d.pulls.filter((p) => p.mergedAt && !isBot(p.author) && (p.body ?? "").length > 300).map((p) => ({ d, p }))));
+  // Titles must be unique within the repo, otherwise the question has two right answers.
+  const titleCount = new Map<string, number>();
+  for (const d of data) for (const t of [...d.pulls, ...d.issues]) titleCount.set(`${d.repo}|${t.title.toLowerCase()}`, (titleCount.get(`${d.repo}|${t.title.toLowerCase()}`) ?? 0) + 1);
+  const pool = shuffle(data.flatMap((d) => d.pulls.filter((p) => p.mergedAt && !isBot(p.author) && (p.body ?? "").length > 300 && titleCount.get(`${d.repo}|${p.title.toLowerCase()}`) === 1).map((p) => ({ d, p }))));
   const used = new Set<string>();
   for (const { d, p } of pool) {
     if (questions.filter((q) => q.category === "lookup").length >= PER_CATEGORY) break;

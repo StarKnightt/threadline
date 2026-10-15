@@ -49,7 +49,9 @@ async function generateWithFallback(opts: Omit<Parameters<typeof generateText>[0
   let last: unknown;
   for (const id of models) {
     try {
-      const res = await generateText({ ...opts, model: groq(id), providerOptions: { groq: { reasoningEffort: "low", parallelToolCalls: false } } } as Parameters<typeof generateText>[0]);
+      // gpt-oss models take low reasoning effort; Qwen3 supports turning thinking off entirely.
+      const reasoningEffort = id.startsWith("qwen/") ? "none" : "low";
+      const res = await generateText({ ...opts, model: groq(id), providerOptions: { groq: { reasoningEffort, parallelToolCalls: false } } } as Parameters<typeof generateText>[0]);
       return { res, model: id };
     } catch (e) {
       last = e;

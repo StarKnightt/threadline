@@ -20,6 +20,11 @@ const OUT = "eval/results.jsonl";
 
 type Q = { id: string; category: string; question: string; gold: string[]; goldKeys: string[] };
 const { questions } = JSON.parse(readFileSync("eval/questions.json", "utf8")) as { questions: Q[] };
+
+// Questions rotate across three models within each category (daily token caps are per model).
+// Both systems always answer a given question with the same model.
+export const ROTATION = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"];
+const assigned = (q: Q) => ROTATION[(Number(q.id.split("-").pop()) - 1) % ROTATION.length];
 const done = new Set(
   existsSync(OUT)
     ? readFileSync(OUT, "utf8").split("\n").filter(Boolean).map((l) => {
@@ -41,6 +46,7 @@ async function main() {
   let ran = 0;
   for (const q of questions) {
     if (CATEGORY && q.category !== CATEGORY) continue;
+    if (!process.argv.includes("--all") && assigned(q) !== MODEL) continue;
     for (const system of ["vector", "graph"] as const) {
       if (ONLY && ONLY !== system) continue;
       if (done.has(`${q.id}|${system}|${MODEL}`)) continue;
