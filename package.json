@@ -17,7 +17,9 @@
     "verify:cypher": "tsx scripts/verify-cypher.ts",
     "ask": "tsx --conditions=react-server scripts/ask.ts",
     "layout": "tsx scripts/layout.ts",
-    "eval:summary": "tsx eval/summarize.ts"
+    "eval:summary": "tsx eval/summarize.ts",
+    "showcase": "tsx --conditions=react-server scripts/showcase.ts",
+    "docs:cypher": "tsx scripts/docs-cypher.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.61",

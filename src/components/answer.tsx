@@ -5,7 +5,7 @@ import { labelOf, shortName, type Citation } from "@/lib/agent/types";
 import { githubUrl } from "@/lib/client/trace-state";
 import { COLORS } from "./scene";
 
-const KEY_SPLIT = /\[?\b((?:pr|issue|person|file|dir|release|doc|concept|repo|label):[^\s\]\[;,()]+?)\]?(?=[\s.,;)\]]|$)/g;
+const KEY_SPLIT = /[\[【]?\b((?:pr|issue|person|file|dir|release|doc|concept|repo|label):[^\s\]\[;,()【】「」'"*]+?)[\]】]?(?=[\s.,;)\]【】*]|$)/g;
 
 export function KeyChip({ k, status, onHover }: { k: string; status?: "ok" | "rejected"; onHover?: (k: string | null) => void }) {
   const url = githubUrl(k);

@@ -8,7 +8,7 @@ export function answerItems(answer: string): string[] {
 }
 
 export function normalise(s: string): string {
-  let x = s.trim().toLowerCase().replace(/[*`"'[\]()]/g, "").trim();
+  let x = s.trim().toLowerCase().replace(/[*`"'[\]()【】]/g, "").trim();
   const key = /^(?:pr|issue):[^#]+#(\d+)$/.exec(x);
   if (key) return `#${key[1]}`;
   x = x.replace(/^person:/, "").replace(/^@/, "");

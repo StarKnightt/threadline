@@ -42,6 +42,7 @@ async function main() {
     ["activity.REVIEWED", Q.activity.REVIEWED, { repo: "falkordb-ts", since: 1735689600, until: 1767225600, limit: 5 }],
     ["activity.MERGED", Q.activity.MERGED, { repo: "FalkorDB", since: 0, until: 4102444800, limit: 5 }],
     ["activity.COMMENTED_ON", Q.activity.COMMENTED_ON, { repo: null, since: 0, until: 4102444800, limit: 5 }],
+    ["activityInArea", Q.activityInArea, { area: "src/index", repo: "FalkorDB", rel: "AUTHORED", since: 0, until: 4102444800, limit: 5 }],
     ["pageRankReviewers", Q.pageRankReviewers, {}],
     ["betweennessBridges", Q.betweennessBridges, {}],
     ["subsystems", Q.subsystems, {}],

@@ -4,7 +4,7 @@ export async function GET() {
   const t = Date.now();
   try {
     const [labels, rels, meta, sync] = await Promise.all([
-      query<{ label: string; n: number }>(BRAIN, "MATCH (n) RETURN labels(n)[0] AS label, count(n) AS n ORDER BY n DESC", {}, { ro: true }),
+      query<{ label: string; n: number }>(BRAIN, "MATCH (n) RETURN labels(n)[size(labels(n)) - 1] AS label, count(n) AS n ORDER BY n DESC", {}, { ro: true }),
       query<{ n: number }>(BRAIN, "MATCH ()-[r]->() RETURN count(r) AS n", {}, { ro: true }),
       query<{ loadedAt: number }>(BRAIN, "MATCH (m:Meta {key: 'meta'}) RETURN m.loadedAt AS loadedAt", {}, { ro: true }),
       query<{ at: number; items: number }>(BRAIN, "MATCH (s:SyncRun) RETURN s.at AS at, s.items AS items ORDER BY s.at DESC LIMIT 1", {}, { ro: true }),

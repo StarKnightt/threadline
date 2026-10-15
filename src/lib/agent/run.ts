@@ -12,7 +12,7 @@ export const MODELS = (process.env.TL_MODELS ?? "openai/gpt-oss-120b,openai/gpt-
 
 export type MemoryContext = { facts: string[]; previous?: { question: string; refs: string[] }; playbook?: { questionType: string; toolSequence: string } };
 
-const CITE_RE = /\b((?:pr|issue|person|file|dir|release|doc|concept|repo|label):[^\s\]\[;,()]+)/g;
+const CITE_RE = /\b((?:pr|issue|person|file|dir|release|doc|concept|repo|label):[^\s\]\[;,()【】「」'"*]+)/g;
 
 function systemPrompt(now: number, mem?: MemoryContext) {
   const lines = [
