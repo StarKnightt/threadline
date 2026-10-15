@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "ingest:fetch": "tsx scripts/fetch.ts",
+    "ingest:normalise": "tsx scripts/normalise.ts",
+    "ingest:embed": "tsx scripts/embed.ts",
+    "ingest:load": "tsx scripts/load.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.61",

@@ -46,3 +46,5 @@ next-env.d.ts
 /data/raw/
 /data/cache/
 /.playwright-mcp/
+/data/graph/
+/data/*.log
