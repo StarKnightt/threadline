@@ -1,7 +1,7 @@
 // Run the evaluation: every question through the vector RAG baseline and the graph agent,
 // same LLM, same embeddings, same FalkorDB vector index. Resumable (skips finished pairs),
 // and stops cleanly when the daily Groq token cap is reached.
-// Usage: pnpm eval:run [--model openai/gpt-oss-20b] [--only graph|vector] [--limit N] [--category expertise]
+// Usage: pnpm eval:run [--model openai/gpt-oss-20b] [--only graph|vector] [--limit N] [--category expertise] [--wait]
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import "../scripts/lib/env";
 import { close } from "../src/lib/falkor";
@@ -41,6 +41,13 @@ const msgOf = (e: unknown) => {
 };
 const isCap = (e: unknown) => /tokens per day|\(TPD\)/i.test(msgOf(e));
 const isRate = (e: unknown) => /rate limit|429|tokens per minute|TPM/i.test(msgOf(e));
+// With --wait, a daily cap pauses until Groq's bucket refills instead of exiting.
+const WAIT = process.argv.includes("--wait");
+const waitMs = (e: unknown) => {
+  const m = /try again in (?:(\d+)h)?(?:(\d+)m)?(?:([\d.]+)s)?/i.exec(msgOf(e));
+  if (!m || !m[0].match(/\d/)) return 10 * 60000;
+  return ((Number(m[1] ?? 0) * 60 + Number(m[2] ?? 0)) * 60 + Number(m[3] ?? 0)) * 1000;
+};
 
 async function main() {
   let ran = 0;
@@ -61,6 +68,13 @@ async function main() {
                 ? await runGraphAgent(q.question, () => {}, undefined, { handoff: false, models: [MODEL] })
                 : await runVectorBaseline(q.question, () => {}, { models: [MODEL] });
           } catch (e) {
+            if (isCap(e) && WAIT) {
+              const ms = Math.min(waitMs(e) + 15000, 45 * 60000);
+              console.log(`${q.id} ${system}: daily cap for ${MODEL}, waiting ${Math.round(ms / 60000)} min`);
+              await sleep(ms);
+              attempt = 0;
+              continue;
+            }
             if (isCap(e) || !isRate(e) || attempt >= 5) throw e;
             await sleep(30000);
           }

@@ -105,7 +105,7 @@ const STOP = new Set("the and for who what which with that this from into have h
 
 const shortRef = (k: string) => k.replace(/^(?:pr|issue):FalkorDB\//, "").replace(/^(?:pr|issue):/, "");
 
-const repoArg = z.string().optional().describe("Repository short name, for example FalkorDB, falkordb-browser, QueryWeaver, GraphRAG-SDK, falkordb-ts, FalkorDB-MCPServer");
+const repoArg = z.string().nullish().describe("Repository short name, for example FalkorDB, falkordb-browser, QueryWeaver, GraphRAG-SDK, falkordb-ts, FalkorDB-MCPServer");
 
 export function makeTools(ctx: ToolCtx) {
   return {
@@ -114,7 +114,7 @@ export function makeTools(ctx: ToolCtx) {
         "Resolve words in the question to graph nodes. Combines exact lookup (issue or PR numbers, logins, keys), full-text search over titles, names and paths, concept matching, and vector search over text chunks mapped back to their thread or doc. Always call this first.",
       inputSchema: z.object({
         text: z.string().describe("The phrase to resolve, for example 'vector index' or 'browser login bug'"),
-        number: z.number().int().optional().describe("Issue or PR number if the question names one"),
+        number: z.number().int().nullish().describe("Issue or PR number if the question names one"),
         repo: repoArg,
       }),
       execute: async ({ text, number, repo }) =>
@@ -169,8 +169,8 @@ export function makeTools(ctx: ToolCtx) {
         "Step one hop out from a node. Optionally restrict relationship types: AUTHORED, REVIEWED, MERGED, COMMENTED_ON, ASSIGNED_TO, HAS_LABEL, TOUCHED, IN_DIR, CLOSES, REFERENCES, SHIPPED_IN, PREVIOUS, MENTIONS, DOCUMENTS, KNOWS, CONTRIBUTES_TO, REVIEWS_FOR, CO_CHANGES, DECLARED_OWNER, IN_REPO.",
       inputSchema: z.object({
         key: z.string(),
-        types: z.array(z.string()).optional(),
-        limit: z.number().int().min(1).max(40).optional(),
+        types: z.array(z.string()).nullish(),
+        limit: z.number().int().min(1).max(40).nullish(),
       }),
       execute: async ({ key, types, limit }) =>
         step(ctx, "expand", { key, types, limit }, async () => {
@@ -310,14 +310,14 @@ export function makeTools(ctx: ToolCtx) {
       inputSchema: z.object({
         metric: z.enum(["AUTHORED", "REVIEWED", "MERGED", "COMMENTED_ON"]),
         repo: repoArg,
-        kind: z.enum(["pr", "issue"]).optional(),
-        since: z.string().optional(),
-        until: z.string().optional(),
-        area: z.string().optional().describe("Directory path, for example src/index"),
+        kind: z.enum(["pr", "issue"]).nullish(),
+        since: z.string().nullish(),
+        until: z.string().nullish(),
+        area: z.string().nullish().describe("Directory path, for example src/index"),
       }),
       execute: async ({ metric, repo, kind, since, until, area }) =>
         step(ctx, "activity", { metric, repo, kind, since, until, area }, async () => {
-          const toTs = (s: string | undefined, d: number) => (s && !Number.isNaN(Date.parse(s)) ? Math.floor(Date.parse(s) / 1000) : d);
+          const toTs = (s: string | null | undefined, d: number) => (s && !Number.isNaN(Date.parse(s)) ? Math.floor(Date.parse(s) / 1000) : d);
           const params: Record<string, unknown> = { repo: repo ?? null, since: toTs(since, 0), until: toTs(until, 4102444800), limit: 10 };
           if (area && (metric === "AUTHORED" || metric === "REVIEWED")) {
             const path = area.replace(/^dir:[^:]+:/, "").replace(/^\/+|\/+$/g, "");
