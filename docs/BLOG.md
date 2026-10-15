@@ -179,7 +179,7 @@ How I read these numbers:
 
 Impact scored only 0.30, and the reason is instructive. The graph agent missed seven of its ten questions, and in six of those it answered "none". Checking the misses with Cypher showed the data was there: PR #272 is open and touches files under `clients/python/queryweaver_client`, exactly as the gold answer says. The problem was the tool. The questions write paths with a trailing slash (`clients/python/queryweaver_client/`), the `impact` tool matched them with `CONTAINS` against directory paths stored without one, and so the query returned nothing. The agent then reported, truthfully, that its tool found no open PRs. Another tool in the same file already stripped slashes; `impact` did not.
 
-The fix is one line. After it, the impact query itself returns the gold PRs for 9 of the 10 impact questions; the tenth sits under `.claude/`, which the tool deliberately skips. I have **not** rerun the agent evaluation, so the published numbers above are the measured, pre-fix ones. The lesson for me is that an honest eval is mostly useful for what it tells you about your own tools.
+The fix is one line. After it, the impact query itself returns the gold PRs for 9 of the 10 impact questions; the tenth sits under `.claude/`, which the tool deliberately skips. On production, the exact question the agent missed first now comes back as PR #272 with 1 of 1 citations verified ([trace](https://threadline-graph.vercel.app/t/4893d6b2-b5e)). That is one spot check, not an evaluation: I have **not** rerun the agent evaluation, so the published numbers above are the measured, pre-fix ones. The lesson for me is that an honest eval is mostly useful for what it tells you about your own tools.
 
 ## Running on free tiers, and what it costs
 
