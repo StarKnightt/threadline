@@ -1,0 +1,203 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "generatedAt": "2026-10-15T06:54:54.216Z",
+  "pairedQuestions": 5,
+  "overall": {
+    "graph": {
+      "n": 5,
+      "f1": 0.9,
+      "precision": 0.9,
+      "recall": 0.9,
+      "exact": 0.8,
+      "tokens": 6748.4,
+      "p50ms": 43936,
+      "p95ms": 48144,
+      "steps": 2,
+      "citationValidity": null,
+      "fullyGrounded": null
+    },
+    "vector": {
+      "n": 5,
+      "f1": 0.6,
+      "precision": 0.6,
+      "recall": 0.6,
+      "exact": 0.6,
+      "tokens": 1688,
+      "p50ms": 12049,
+      "p95ms": 13955,
+      "steps": 1,
+      "citationValidity": null,
+      "fullyGrounded": null
+    }
+  },
+  "categories": {
+    "lookup": {
+      "graph": {
+        "n": 5,
+        "f1": 0.9,
+        "precision": 0.9,
+        "recall": 0.9,
+        "exact": 0.8,
+        "tokens": 6748.4,
+        "p50ms": 43936,
+        "p95ms": 48144,
+        "steps": 2,
+        "citationValidity": null,
+        "fullyGrounded": null
+      },
+      "vector": {
+        "n": 5,
+        "f1": 0.6,
+        "precision": 0.6,
+        "recall": 0.6,
+        "exact": 0.6,
+        "tokens": 1688,
+        "p50ms": 12049,
+        "p95ms": 13955,
+        "steps": 1,
+        "citationValidity": null,
+        "fullyGrounded": null
+      }
+    },
+    "expertise": {
+      "graph": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      },
+      "vector": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      }
+    },
+    "trace": {
+      "graph": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      },
+      "vector": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      }
+    },
+    "cross_repo": {
+      "graph": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      },
+      "vector": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      }
+    },
+    "impact": {
+      "graph": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      },
+      "vector": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      }
+    },
+    "aggregation": {
+      "graph": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      },
+      "vector": {
+        "n": 0,
+        "f1": 0,
+        "precision": 0,
+        "recall": 0,
+        "exact": 0,
+        "tokens": 0,
+        "p50ms": 0,
+        "p95ms": 0,
+        "steps": 0,
+        "citationValidity": null,
+        "fullyGrounded": null
+      }
+    }
+  }
+}

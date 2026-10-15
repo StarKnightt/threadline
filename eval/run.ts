@@ -30,7 +30,12 @@ const done = new Set(
 );
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const isCap = (e: unknown) => /tokens per day|TPD|daily|quota/i.test(String((e as Error)?.message ?? e));
+const msgOf = (e: unknown) => {
+  const err = e as { message?: string; lastError?: { message?: string; responseBody?: string } };
+  return `${err?.message ?? e} ${err?.lastError?.message ?? ""} ${err?.lastError?.responseBody ?? ""}`;
+};
+const isCap = (e: unknown) => /tokens per day|\(TPD\)/i.test(msgOf(e));
+const isRate = (e: unknown) => /rate limit|429|tokens per minute|TPM/i.test(msgOf(e));
 
 async function main() {
   let ran = 0;
@@ -42,10 +47,18 @@ async function main() {
       if (ran >= LIMIT) return;
       const t0 = Date.now();
       try {
-        const trace =
-          system === "graph"
-            ? await runGraphAgent(q.question, () => {}, undefined, { handoff: false, models: [MODEL] })
-            : await runVectorBaseline(q.question, () => {}, { models: [MODEL] });
+        let trace: Awaited<ReturnType<typeof runGraphAgent>> | undefined;
+        for (let attempt = 0; !trace; attempt++) {
+          try {
+            trace =
+              system === "graph"
+                ? await runGraphAgent(q.question, () => {}, undefined, { handoff: false, models: [MODEL] })
+                : await runVectorBaseline(q.question, () => {}, { models: [MODEL] });
+          } catch (e) {
+            if (isCap(e) || !isRate(e) || attempt >= 5) throw e;
+            await sleep(30000);
+          }
+        }
         const s = score(trace.answer, q.gold);
         const row = {
           id: q.id,
