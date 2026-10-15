@@ -23,7 +23,8 @@ function systemPrompt(now: number, mem?: MemoryContext) {
     "- Who knows / who should review an area: find_entities, then who_knows with the concept key (concept:...) or a path fragment such as src/index.",
     "- What fixed issue #N / which release shipped it / what references it: find_entities with number and repo, then trace on the issue or PR key.",
     "- What is affected by changing an area / open PRs touching a path: impact with the path fragment.",
-    "- Who did the most X in a repo or year: activity (metric AUTHORED with kind pr or issue, REVIEWED, MERGED, COMMENTED_ON; since/until as YYYY-MM-DD).",
+    "- Who did the most X in a repo, year or directory: activity (metric AUTHORED with kind pr or issue, REVIEWED, MERGED, COMMENTED_ON; since/until as YYYY-MM-DD; area for a directory path).",
+    "- Cross-repo references: trace gives each referencing thread with a crossRepo flag; only list rows where crossRepo is true when asked about other repositories.",
     "- How two things relate: find_entities for each, then connect. Org-wide influence: rank.",
     "Rules:",
     "- Prefer the typed tools. Use cypher_readonly only when nothing else fits.",
@@ -171,7 +172,7 @@ export async function runVectorBaseline(question: string, emit: (e: Record<strin
   const t0 = Date.now();
   const vec = await embedQuestion(question);
   const t = Date.now();
-  const { rows } = await query<{ chunk: string; text: string; key: string; name: string; score: number }>(BRAIN, Q.vectorRag, { vec, k: opts.k ?? 8 }, { ro: true });
+  const { rows } = await query<{ chunk: string; text: string; key: string; name: string; author: string | null; state: string | null; createdAt: number | null; score: number }>(BRAIN, Q.vectorRag, { vec, k: opts.k ?? 8 }, { ro: true });
   const step: TraceStep = {
     step: 1,
     tool: "vector_search",
@@ -183,7 +184,10 @@ export async function runVectorBaseline(question: string, emit: (e: Record<strin
     rows: rows.map((r) => ({ key: r.key, name: r.name, score: Math.round(r.score * 1000) / 1000 })),
   };
   emit({ type: "step_result", ...step });
-  const context = rows.map((r, i) => `[${i + 1}] source ${r.key} (${r.name}):\n${r.text}`).join("\n\n");
+  // Each chunk carries its document's metadata (title, author, state, date), as a typical RAG pipeline would.
+  const meta = (r: (typeof rows)[number]) =>
+    [r.author && `opened by ${r.author}`, r.state && `state ${r.state}`, r.createdAt && `created ${new Date(r.createdAt * 1000).toISOString().slice(0, 10)}`].filter(Boolean).join(", ");
+  const context = rows.map((r, i) => `[${i + 1}] source ${r.key} "${r.name}"${meta(r) ? ` (${meta(r)})` : ""}:\n${r.text}`).join("\n\n");
   const { res, model } = await generateWithFallback(
     {
       system: [

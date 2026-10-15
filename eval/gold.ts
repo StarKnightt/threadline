@@ -51,7 +51,7 @@ const push = (category: string, q: Omit<Question, "id" | "category"> & Partial<Q
     used.add(d.repo);
     push("lookup", {
       question: `Who opened pull request #${p.number} in the ${d.repo} repository, and what was it about?`,
-      gold: [p.author.login.toLowerCase()],
+      gold: [p.author.login.toLowerCase(), `#${p.number}`],
       goldKeys: [`pr:${ORG}/${d.repo}#${p.number}`, `person:${p.author.login}`],
       detail: p.title,
     });

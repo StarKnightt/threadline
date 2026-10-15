@@ -298,18 +298,26 @@ export function makeTools(ctx: ToolCtx) {
     }),
 
     activity: tool({
-      description: "Rank people by activity: who authored, reviewed, merged or commented on the most threads, optionally in one repo, one kind (pr or issue) and a date window (YYYY-MM-DD).",
+      description:
+        "Rank people by activity: who authored, reviewed, merged or commented on the most threads, optionally in one repo, one kind (pr or issue), a date window (YYYY-MM-DD), or one directory (area, for example src/index: counts merged PRs touching files under it).",
       inputSchema: z.object({
         metric: z.enum(["AUTHORED", "REVIEWED", "MERGED", "COMMENTED_ON"]),
         repo: repoArg,
         kind: z.enum(["pr", "issue"]).optional(),
         since: z.string().optional(),
         until: z.string().optional(),
+        area: z.string().optional().describe("Directory path, for example src/index"),
       }),
-      execute: async ({ metric, repo, kind, since, until }) =>
-        step(ctx, "activity", { metric, repo, kind, since, until }, async () => {
+      execute: async ({ metric, repo, kind, since, until, area }) =>
+        step(ctx, "activity", { metric, repo, kind, since, until, area }, async () => {
           const toTs = (s: string | undefined, d: number) => (s && !Number.isNaN(Date.parse(s)) ? Math.floor(Date.parse(s) / 1000) : d);
           const params: Record<string, unknown> = { repo: repo ?? null, since: toTs(since, 0), until: toTs(until, 4102444800), limit: 10 };
+          if (area && (metric === "AUTHORED" || metric === "REVIEWED")) {
+            const path = area.replace(/^dir:[^:]+:/, "").replace(/^\/+|\/+$/g, "");
+            const r = await run(Q.activityInArea, { ...params, area: path, rel: metric });
+            const edges: TraceEdge[] = r.rows.flatMap((x) => [[x.key as string, "KNOWS", x.area as string] as TraceEdge, ...((x.sample as string[]) ?? []).map((s) => [x.key as string, metric, s] as TraceEdge)]);
+            return { runs: [r], rows: r.rows, edges, note: r.rows.length ? undefined : `No directory with path exactly '${path}'. Try who_knows for fuzzy matching.` };
+          }
           if (metric === "AUTHORED") params.kind = kind ?? null;
           const r = await run(Q.activity[metric], params);
           const edges: TraceEdge[] = r.rows.flatMap((x) => ((x.sample as string[]) ?? []).map((s) => [x.key as string, metric, s] as TraceEdge));

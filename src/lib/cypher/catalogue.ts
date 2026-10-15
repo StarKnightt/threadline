@@ -148,6 +148,14 @@ RETURN p.key AS key, p.login AS person, sum(e.count) AS n, collect(t.key)[0..3] 
 ORDER BY n DESC LIMIT $limit`,
   },
 
+  /** Activity inside one directory: authors (or reviewers) of merged PRs that touched files under it. */
+  activityInArea: `MATCH (d:Directory)
+WHERE toLower(d.path) = toLower($area) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
+MATCH (d)<-[:IN_DIR*1..6]-(:File)<-[:TOUCHED]-(t:PullRequest)<-[e:AUTHORED|REVIEWED]-(p:Person)
+WHERE p.isBot = false AND t.mergedAt IS NOT NULL AND type(e) = $rel AND t.createdAt >= $since AND t.createdAt < $until
+RETURN p.key AS key, p.login AS person, d.key AS area, count(DISTINCT t) AS n, collect(DISTINCT t.key)[0..3] AS sample
+ORDER BY n DESC LIMIT $limit`,
+
   /** Q8: key reviewers. PageRank over the derived who-reviews-whom graph. */
   pageRankReviewers: `CALL algo.pageRank('Person', 'REVIEWS_FOR') YIELD node, score
 WHERE node.isBot = false
@@ -186,6 +194,6 @@ RETURN n1.key AS key, type(r1) AS rel, id(startNode(r1)) = id(s) AS outgoing, ho
   /** Vector RAG baseline (same index, no graph traversal): top chunks with their text. */
   vectorRag: `CALL db.idx.vector.queryNodes('Chunk', 'embedding', $k, vecf32($vec)) YIELD node, score
 MATCH (node)-[:PART_OF]->(n:Entity)
-RETURN node.key AS chunk, node.text AS text, n.key AS key, ${NAME} AS name, score
+RETURN node.key AS chunk, node.text AS text, n.key AS key, ${NAME} AS name, n.author AS author, n.state AS state, n.createdAt AS createdAt, score
 ORDER BY score DESC`,
 } as const;

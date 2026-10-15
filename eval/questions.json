@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-10-15T06:13:29.018Z",
+  "generatedAt": "2026-10-15T06:30:52.445Z",
   "since": "2023-01-01",
   "questions": [
     {
       "question": "Who opened pull request #152 in the falkordb-browser repository, and what was it about?",
       "gold": [
-        "anchel123"
+        "anchel123",
+        "#152"
       ],
       "goldKeys": [
         "pr:FalkorDB/falkordb-browser#152",
@@ -18,7 +19,8 @@
     {
       "question": "Who opened pull request #2628 in the FalkorDB repository, and what was it about?",
       "gold": [
-        "aviavni"
+        "aviavni",
+        "#2628"
       ],
       "goldKeys": [
         "pr:FalkorDB/FalkorDB#2628",
@@ -31,7 +33,8 @@
     {
       "question": "Who opened pull request #9 in the falkordb-ts repository, and what was it about?",
       "gold": [
-        "gkorland"
+        "gkorland",
+        "#9"
       ],
       "goldKeys": [
         "pr:FalkorDB/falkordb-ts#9",
@@ -44,7 +47,8 @@
     {
       "question": "Who opened pull request #176 in the GraphRAG-SDK repository, and what was it about?",
       "gold": [
-        "aryan757"
+        "aryan757",
+        "#176"
       ],
       "goldKeys": [
         "pr:FalkorDB/GraphRAG-SDK#176",
@@ -57,7 +61,8 @@
     {
       "question": "Who opened pull request #53 in the FalkorDB-MCPServer repository, and what was it about?",
       "gold": [
-        "gkorland"
+        "gkorland",
+        "#53"
       ],
       "goldKeys": [
         "pr:FalkorDB/FalkorDB-MCPServer#53",
@@ -70,7 +75,8 @@
     {
       "question": "Who opened pull request #107 in the QueryWeaver repository, and what was it about?",
       "gold": [
-        "gkorland"
+        "gkorland",
+        "#107"
       ],
       "goldKeys": [
         "pr:FalkorDB/QueryWeaver#107",
@@ -83,7 +89,8 @@
     {
       "question": "Who opened pull request #2042 in the falkordb-browser repository, and what was it about?",
       "gold": [
-        "anchel123"
+        "anchel123",
+        "#2042"
       ],
       "goldKeys": [
         "pr:FalkorDB/falkordb-browser#2042",
@@ -96,7 +103,8 @@
     {
       "question": "Who opened pull request #2845 in the FalkorDB repository, and what was it about?",
       "gold": [
-        "aviavni"
+        "aviavni",
+        "#2845"
       ],
       "goldKeys": [
         "pr:FalkorDB/FalkorDB#2845",
@@ -109,7 +117,8 @@
     {
       "question": "Who opened pull request #736 in the QueryWeaver repository, and what was it about?",
       "gold": [
-        "anchel123"
+        "anchel123",
+        "#736"
       ],
       "goldKeys": [
         "pr:FalkorDB/QueryWeaver#736",
@@ -122,7 +131,8 @@
     {
       "question": "Who opened pull request #3094 in the FalkorDB repository, and what was it about?",
       "gold": [
-        "aviavni"
+        "aviavni",
+        "#3094"
       ],
       "goldKeys": [
         "pr:FalkorDB/FalkorDB#3094",
