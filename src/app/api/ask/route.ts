@@ -4,7 +4,7 @@ import type { Trace } from "@/lib/agent/types";
 import { embedQuestion } from "@/lib/embed";
 import { bump, ensureShared, loadMemory, persist } from "@/lib/memory";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 const PER_IP = Number(process.env.ASK_PER_IP_PER_HOUR ?? 10);
 const GLOBAL = Number(process.env.ASK_GLOBAL_PER_DAY ?? 300);
