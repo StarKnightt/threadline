@@ -149,5 +149,11 @@ if (live) {
 }
 
 await browser.close();
-for (const f of readdirSync(tmp)) rmSync(tmp + f);
+for (const f of readdirSync(tmp)) {
+  try {
+    rmSync(tmp + f, { force: true });
+  } catch {
+    console.log(`left locked temp file ${f}`);
+  }
+}
 console.log("footage in", dir);

@@ -281,7 +281,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
               rows={2}
               maxLength={400}
               placeholder="Who should review a change to the vector index code?"
-              className="w-full resize-none rounded-lg border border-white/10 bg-surface px-3 py-2 text-[13.5px] text-slate-100 outline-none placeholder:text-slate-600 focus:border-violet-400/50"
+              className="max-h-40 min-h-[58px] w-full resize-none rounded-lg border [field-sizing:content] border-white/10 bg-surface px-3 py-2 text-[13.5px] text-slate-100 outline-none placeholder:text-slate-600 focus:border-violet-400/50"
             />
             <div className="mt-2 flex items-center gap-2">
               <div className="flex rounded-md border border-white/10 p-0.5 text-[11.5px]">
