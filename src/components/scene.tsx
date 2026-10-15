@@ -285,11 +285,11 @@ export function Scene({
   const theme = useTheme();
   const S = STAGE[theme];
   const dark = theme === "dark";
-  const c = constellation ?? { nodes: [], edges: [] };
+  const c = useMemo(() => constellation ?? { nodes: [], edges: [] }, [constellation]);
   const base = useMemo(() => new Map(c.nodes.map((n) => [n.key, new THREE.Vector3(n.x, n.y, n.z)])), [c]);
   const data = useMemo(() => (lane ? sceneData(lane, upTo) : null), [lane, upTo]);
   const isVector = lane?.mode === "vector";
-  const chunks = isVector ? (lane?.chunks ?? []) : [];
+  const chunks = useMemo(() => (isVector ? (lane?.chunks ?? []) : []), [isVector, lane]);
 
   const goldKeys = useMemo(() => new Set((lane?.citations ?? []).filter((x) => x.ok).flatMap((x) => [x.key, ...x.path.flatMap((e) => [e[0], e[2]])])), [lane]);
   const verifierShown = !!lane?.steps.slice(0, upTo).some((s) => s.agent === "verifier");

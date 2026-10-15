@@ -11,7 +11,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const browser = await chromium.launch({ channel: "chrome", args: ["--use-angle=d3d11", "--ignore-gpu-blocklist"] });
 try {
   for (const theme of ["dark", "light"]) {
-    const ctx = await browser.newContext({ viewport: { width: 1600, height: 900 } });
+    const ctx = await browser.newContext(process.env.MOBILE ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } : { viewport: { width: 1600, height: 900 } });
     await ctx.addInitScript((t) => localStorage.setItem("tl_theme", t), theme);
     const page = await ctx.newPage();
     const errors = [];
