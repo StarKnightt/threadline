@@ -1,6 +1,6 @@
 "use client";
 
-import { CameraControls, Html, Line, Stars } from "@react-three/drei";
+import { CameraControls, Line, Stars } from "@react-three/drei";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
@@ -215,18 +215,34 @@ function TraceEdges({ edges, pos, activeStep }: { edges: ReturnType<typeof scene
   );
 }
 
-function Labels({ items }: { items: { key: string; p: THREE.Vector3; label: string; text?: string; strong?: boolean }[] }) {
-  return (
-    <>
-      {items.map((it) => (
-        <Html key={it.key} position={it.p} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          <div className={`tl-label ${it.strong ? "tl-label-strong" : ""}`} style={{ borderColor: COLORS[it.label] ?? "#888" }}>
-            {it.text ?? shortName(it.key)}
-          </div>
-        </Html>
-      ))}
-    </>
-  );
+type LabelItem = { key: string; p: THREE.Vector3; label: string; text?: string; strong?: boolean; priority: number };
+
+/** Projects label anchors to screen space every frame and hides labels that would overlap a higher-priority one. */
+function LabelProjector({ items, refs }: { items: LabelItem[]; refs: React.RefObject<Map<string, HTMLDivElement>> }) {
+  const v = useMemo(() => new THREE.Vector3(), []);
+  useFrame(({ camera, size }) => {
+    const placed: [number, number, number, number][] = [];
+    const sorted = [...items].sort((a, b) => b.priority - a.priority);
+    for (const it of sorted) {
+      const el = refs.current?.get(it.key);
+      if (!el) continue;
+      v.copy(it.p).project(camera);
+      const x = (v.x * 0.5 + 0.5) * size.width;
+      const y = (-v.y * 0.5 + 0.5) * size.height;
+      const w = (it.text ?? shortName(it.key)).length * 6.4 + 12;
+      const box: [number, number, number, number] = [x - w / 2, y - 26, x + w / 2, y - 8];
+      const behind = v.z > 1 || x < -50 || x > size.width + 50 || y < -20 || y > size.height + 20;
+      const hit = placed.some((b) => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]);
+      if (behind || hit) {
+        el.style.opacity = "0";
+        continue;
+      }
+      placed.push(box);
+      el.style.opacity = "1";
+      el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+    }
+  });
+  return null;
 }
 
 function Rig({ focus, idle }: { focus: THREE.Sphere | null; idle: boolean }) {
@@ -300,21 +316,24 @@ export function Scene({
   }, [traceNodes, chunkPoints, isVector, verifierShown]);
 
   const labelItems = useMemo(() => {
-    const items: { key: string; p: THREE.Vector3; label: string; text?: string; strong?: boolean }[] = [];
+    const items: LabelItem[] = [];
     const repos = c.nodes.filter((n) => n.label === "Repo");
-    for (const r of repos) items.push({ key: r.key, p: new THREE.Vector3(r.x, r.y + 12, r.z), label: "Repo", text: r.name });
+    for (const r of repos) items.push({ key: r.key, p: new THREE.Vector3(r.x, r.y + 9, r.z), label: "Repo", text: r.name, priority: 1 });
     if (isVector) {
-      chunkPoints.slice(0, 8).forEach((cp) => items.push({ key: cp.key, p: cp.p, label: "Chunk", text: `${shortName(cp.owner)} · ${cp.score.toFixed(2)}` }));
+      chunkPoints.slice(0, 8).forEach((cp, i) => items.push({ key: cp.key, p: cp.p.clone().add(new THREE.Vector3(0, 3, 0)), label: "Chunk", text: `${shortName(cp.owner)} · ${cp.score.toFixed(2)}`, priority: 10 - i }));
     } else {
-      const pick = traceNodes.filter((n) => n.label !== "Repo" && (n.active || (verifierShown && n.gold) || n.key === hovered)).slice(0, 14);
-      for (const n of pick) items.push({ key: n.key, p: n.p.clone().add(new THREE.Vector3(0, 4.5, 0)), label: n.label, strong: n.gold && verifierShown });
+      const pick = traceNodes.filter((n) => n.label !== "Repo" && (n.active || (verifierShown && n.gold) || n.key === hovered)).slice(0, 24);
+      for (const n of pick)
+        items.push({ key: n.key, p: n.p.clone().add(new THREE.Vector3(0, 3.5, 0)), label: n.label, strong: n.gold && verifierShown, priority: n.key === hovered ? 100 : n.gold && verifierShown ? 50 : n.label === "Person" ? 20 : 10 });
     }
     return items;
   }, [c, traceNodes, chunkPoints, isVector, hovered, verifierShown]);
+  const labelRefs = useRef(new Map<string, HTMLDivElement>());
 
   const idle = !lane || (lane.done && upTo >= lane.steps.length && !hovered);
 
   return (
+    <div className="relative h-full w-full">
     <Canvas dpr={[1, 1.5]} camera={{ position: [0, 160, 720], fov: 45, near: 1, far: 5000 }} gl={{ antialias: true, powerPreference: "high-performance" }}>
       <color attach="background" args={["#05060a"]} />
       <fog attach="fog" args={["#05060a", 700, 2000]} />
@@ -329,12 +348,28 @@ export function Scene({
             <meshBasicMaterial color={new THREE.Color(COLORS.Chunk).multiplyScalar(1.4 + cp.score * 2)} toneMapped={false} />
           </mesh>
         ))}
-      <Labels items={labelItems} />
+      <LabelProjector items={labelItems} refs={labelRefs} />
       <Rig focus={focus} idle={idle} />
       <EffectComposer multisampling={0}>
         <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={1.15} radius={0.7} />
         <Vignette eskil={false} offset={0.2} darkness={0.75} />
       </EffectComposer>
     </Canvas>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {labelItems.map((it) => (
+          <div
+            key={it.key}
+            ref={(el) => {
+              if (el) labelRefs.current.set(it.key, el);
+              else labelRefs.current.delete(it.key);
+            }}
+            className={`tl-label absolute left-0 top-0 ${it.strong ? "tl-label-strong" : ""}`}
+            style={{ borderColor: COLORS[it.label] ?? "#888", opacity: 0 }}
+          >
+            {it.text ?? shortName(it.key)}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
