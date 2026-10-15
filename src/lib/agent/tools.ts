@@ -291,7 +291,7 @@ export function makeTools(ctx: ToolCtx) {
       inputSchema: z.object({ area: z.string().describe("Directory or file path fragment"), repo: repoArg }),
       execute: async ({ area, repo }) =>
         step(ctx, "impact", { area, repo }, async () => {
-          const term = area.replace(/^(dir|file):[^:]+:/, "");
+          const term = area.replace(/^(dir|file):[^:]+:/, "").trim().replace(/^\/+|\/+$/g, "");
           const p = { term, repo: repo ?? null };
           const [a, b, c] = [await run(Q.impactOpenPrs, p), await run(Q.impactOpenIssues, p), await run(Q.coChanges, p)];
           const rows = [...a.rows.map((x) => ({ ...x, kind: "open_pr" })), ...b.rows.map((x) => ({ ...x, kind: "open_issue" })), ...c.rows.map((x) => ({ ...x, kind: "co_changes" }))];

@@ -5,14 +5,14 @@ import { generateText, isStepCount, type LanguageModel } from "ai";
 export const MODELS = (process.env.TL_MODELS ?? "openai/gpt-oss-120b,openai/gpt-oss-20b,qwen/qwen3.8-27b").split(",");
 
 /** Paid fallback for the live /ask route only; the eval and scripts never pass a PaidRun. */
-export const OPENAI_MODEL = process.env.OPENAI_FALLBACK_MODEL?.trim() || "gpt-5.6-luna";
+export const OPENAI_MODEL = process.env.OPENAI_FALLBACK_MODEL?.trim() || "gpt-5.4-mini";
 export const PAID_MAX_CALLS = 4;
 export const PAID_MAX_OUTPUT_TOKENS = 2000;
-export const PAID_RUNS_PER_DAY = Number(process.env.OPENAI_DAILY_RUNS ?? 30);
-export const PAID_RUNS_PER_MONTH = Number(process.env.OPENAI_MONTHLY_RUNS ?? 100);
+export const PAID_RUNS_PER_DAY = Number(process.env.OPENAI_DAILY_RUNS ?? 10);
+export const PAID_RUNS_PER_MONTH = Number(process.env.OPENAI_MONTHLY_RUNS ?? 25);
 
 /** USD per 1M tokens on the Standard tier: input, cached input, output. */
-const PRICES: Record<string, [number, number, number]> = {
+export const PRICES: Record<string, [number, number, number]> = {
   "gpt-5.6-luna": [0.2, 0.02, 1.2],
   "gpt-5.4-mini": [0.75, 0.075, 4.5],
   "gpt-5-nano": [0.05, 0.005, 0.4],

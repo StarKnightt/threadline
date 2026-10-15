@@ -6,8 +6,15 @@ import { nodeVar } from "@/lib/theme";
 import { Q } from "@/lib/cypher/catalogue";
 import { DERIVED, INDEXES } from "@/lib/cypher/schema";
 import { MEM_Q } from "@/lib/memory";
+import { estimateCostUsd, OPENAI_MODEL, PAID_MAX_CALLS, PAID_MAX_OUTPUT_TOKENS, PAID_RUNS_PER_DAY, PAID_RUNS_PER_MONTH, PRICES } from "@/lib/agent/llm";
 
 export const metadata: Metadata = { title: "How it works | Threadline" };
+
+const usd = (n: number | null, digits: number) => (n === null ? "n/a" : `$${n.toFixed(digits)}`);
+const price = PRICES[OPENAI_MODEL];
+// Token counts of a measured production fallback run (3 calls, on gpt-5.6-luna before the switch); the worst case assumes 12,500 uncached input tokens per call.
+const typicalRun = estimateCostUsd(OPENAI_MODEL, 6674, 3870, 190);
+const worstRun = estimateCostUsd(OPENAI_MODEL, PAID_MAX_CALLS * 12500, 0, PAID_MAX_CALLS * PAID_MAX_OUTPUT_TOKENS);
 
 const NODES: [string, string, string][] = [
   ["Repo", "repo:FalkorDB/falkordb-browser", "name, language, stars, url"],
@@ -89,7 +96,12 @@ export default function HowPage() {
         <li>Normalise: deterministic mapping to nodes and edges with stable keys; references parsed from timelines and bodies; concepts from a fixed dictionary.</li>
         <li>Embed: text-embedding-3-small at 256 dimensions, cached by content hash (total spend so far about four US cents).</li>
         <li>Load: <code>UNWIND</code> batches with <code>MERGE</code> on <code>key</code>, then derived edges in Cypher. About 41 MB of the free tier&apos;s 100 MB.</li>
-        <li>Ask: the Investigator (Groq gpt-oss, or a capped OpenAI gpt-5.6-luna fallback when Groq&apos;s daily limits are used up) calls typed graph tools; every tool returns rows, node keys, traversed edges and its Cypher, streamed to the browser.</li>
+        <li>
+          Ask: the Investigator (Groq gpt-oss, or a capped OpenAI {OPENAI_MODEL} fallback when every Groq model has hit its daily limit) calls typed graph tools; every tool returns rows, node keys, traversed edges and its Cypher, streamed to the browser.
+          {price && (
+            <> The fallback allows {PAID_MAX_CALLS} calls of at most {PAID_MAX_OUTPUT_TOKENS.toLocaleString("en-US")} output tokens per run, {PAID_RUNS_PER_DAY} runs a day and {PAID_RUNS_PER_MONTH} a month across all visitors. At OpenAI&apos;s Standard prices ({usd(price[0], 2)} input, {usd(price[1], 3)} cached input, {usd(price[2], 2)} output per million tokens) a typical run costs about {usd(typicalRun, 4)}, a worst-case run about {usd(worstRun, 2)}, and a month at the cap at most about {usd(worstRun === null ? null : worstRun * PAID_RUNS_PER_MONTH, 2)}. Recorded runs never call a model.</>
+          )}
+        </li>
         <li>Verify: the Verifier checks each cited node was observed in a tool result and is reachable from the question&apos;s entry nodes within 4 hops. Rejected claims are handed back once.</li>
         <li>Remember: turns, tool calls and facts go to the visitor&apos;s own graph; verified tool sequences become shared playbooks.</li>
         <li>Stay current: a daily Vercel Cron job merges updated issues and PRs, recomputes derived edges and prunes idle memory graphs.</li>

@@ -36,7 +36,7 @@ describe("OpenAI fallback when every Groq model is capped", () => {
     expect(openai.doGenerateCalls[0].maxOutputTokens).toBe(PAID_MAX_OUTPUT_TOKENS);
     expect(openai.doGenerateCalls[0].providerOptions?.openai).toMatchObject({ reasoningEffort: "none" });
     expect(s.paid.calls).toBe(1);
-    expect(s.paid.costUsd).toBeCloseTo((1000 * 0.2 + 100 * 1.2) / 1e6);
+    expect(s.paid.costUsd).toBeCloseTo((1000 * 0.75 + 100 * 4.5) / 1e6);
   });
 
   it("caps a tool loop at four OpenAI calls and forces an answer on the last one", async () => {

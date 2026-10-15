@@ -33,6 +33,8 @@ type Showcase = { id: string; question: string; verified: number; total: number 
 type Health = { ok: boolean; nodes: number; relationships: number; lastSync?: { at: number } | null; loadedAt?: number | null };
 type Memory = { graph: string; facts: { text: string; kind: string }[]; history: { question: string; at: number; traceId: string; verified: number; total: number }[] };
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
 function ids() {
   if (typeof window === "undefined") return { userId: "", sessionId: "" };
   let userId = localStorage.getItem("tl_user");
@@ -411,7 +413,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
             <div className="relative border-r border-white/[0.06]">
               <div className="pointer-events-none absolute left-4 top-3 z-10">
                 <div className="text-[11px] uppercase tracking-wider text-pink-300">Vector RAG</div>
-                <div className="text-[12px] text-slate-400">{vector.chunks?.length ?? 0} retrieved chunks, no connections between them</div>
+                <div className="text-[12px] text-slate-400">{plural(vector.chunks?.length ?? 0, "retrieved chunk")}, no connections between them</div>
               </div>
               <Scene constellation={constellation} lane={vector} upTo={live ? vector.steps.length : vp.upTo} hovered={hovered} onHover={setHovered} onPick={() => {}} />
             </div>
@@ -420,7 +422,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
             {split && vector && (
               <div className="pointer-events-none absolute left-4 top-3 z-10">
                 <div className="text-[11px] uppercase tracking-wider text-violet-300">Graph agent</div>
-                <div className="text-[12px] text-slate-400">{graph?.steps.filter((s) => s.agent !== "verifier").length ?? 0} tool calls, {hops} traversed edges</div>
+                <div className="text-[12px] text-slate-400">{plural(graph?.steps.filter((s) => s.agent !== "verifier").length ?? 0, "tool call")}, {plural(hops, "traversed edge")}</div>
               </div>
             )}
             <Scene constellation={constellation} lane={graph} upTo={live ? (graph?.steps.length ?? 0) : gp.upTo} hovered={hovered} onHover={setHovered} onPick={(k) => setHovered(k)} />
