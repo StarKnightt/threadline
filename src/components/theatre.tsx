@@ -313,7 +313,9 @@ export function Theatre({ traceId }: { traceId?: string }) {
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3">
-          {error && <div className="mb-3 rounded-md border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-[12px] text-rose-200">{error}</div>}
+          {error && (
+            <div className={`mb-3 rounded-md border px-3 py-2 text-[12px] ${capped ? "border-amber-300/30 bg-amber-300/10 text-amber-200" : "border-rose-400/30 bg-rose-400/10 text-rose-200"}`}>{error}</div>
+          )}
           {asked && (
             <>
               {vector && graph && (

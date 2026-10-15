@@ -43,7 +43,7 @@
 | Aggregation | 4 | 1.00 | 0.00 |
 | **Overall** | **31** | **0.85** | **0.10** |
 
-Average tokens per answer: graph agent 5721, vector RAG 1533. Median latency: graph agent 25.0 s, vector RAG 1.6 s. Vector RAG does best on the control category, where the answer sits in one document; it cannot answer questions whose answer is a join across people, files, pull requests and releases. Every question, gold answer and raw answer is in `eval/` and on [/eval](https://threadline-graph.vercel.app/eval).
+Average tokens per answer: graph agent 5721, vector RAG 1533. Median latency in the eval: graph agent 25.0 s, vector RAG 1.6 s (the eval runs back to back, so graph runs include waiting out the 8,000 tokens per minute limit; single live questions took 1.6 to 15 s in testing). Vector RAG does best on the control category, where the answer sits in one document; it cannot answer questions whose answer is a join across people, files, pull requests and releases. Every question, gold answer and raw answer is in `eval/` and on [/eval](https://threadline-graph.vercel.app/eval).
 <!-- EVAL:END -->
 
 ## Graph data model
