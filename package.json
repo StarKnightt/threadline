@@ -21,7 +21,8 @@
     "showcase": "tsx --conditions=react-server scripts/showcase.ts",
     "docs:cypher": "tsx scripts/docs-cypher.ts",
     "snapshot": "tsx scripts/snapshot.ts",
-    "seed": "tsx scripts/snapshot.ts seed"
+    "seed": "tsx scripts/snapshot.ts seed",
+    "eval:docs": "tsx eval/docs.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.61",

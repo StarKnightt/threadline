@@ -4,7 +4,7 @@ published: false
 tags: graphrag, falkordb, ai, webdev
 ---
 
-> Draft for DEV (account `starknight`). Placeholders in `[brackets]` come from `eval/summary.json` when the evaluation finishes. Add the cover image `shots/02-split-graph-vs-vector.png`.
+> Draft for DEV (account `starknight`). The results section is generated from `eval/summary.json` by `pnpm eval:docs`; remove these comment markers and this note before publishing. Cover image: `shots/02-split-graph-vs-vector.png`. Replace `[link]` with the video URL.
 
 Some questions about a software company are not about any single document. "Who should review a change to the vector index code?" "Which pull request fixed this issue, and which release shipped it?" "What breaks if we change this directory?" The answer lives in how people, pull requests, files and releases connect.
 
@@ -108,11 +108,27 @@ FalkorDB holds thousands of graphs on one instance, so each visitor gets their o
 
 The 3D view is React Three Fiber. The background is a constellation of repositories, active directories, people and concepts, laid out once with `d3-force-3d` and stored as `x, y, z` on the nodes in FalkorDB, so even the layout comes from the graph. When a step arrives, its nodes ignite in their label colour with selective bloom, traversed edges carry a light pulse, the camera eases to the new frontier, and the verifier's evidence path turns gold. Labels are one DOM layer projected every frame with simple collision avoidance, which avoided creating a React root per label.
 
+There is also a light theme. Bloom only works when colours exceed 1.0 against a dark background, so the light stage drops it: nodes switch to darker, saturated variants, faded context fades toward the pale background instead of toward black, and the verified path becomes a deeper gold drawn thicker. The page applies the saved theme in an inline script before first paint, so there is no flash of the wrong theme, and an axe-core check of every page passes WCAG AA contrast in both themes.
+
 ## Did the graph actually help?
 
 Sixty questions in six categories, with gold answers computed by a separate script from the raw GitHub JSON, without FalkorDB, so the graph never grades itself. Both systems use the same model, the same embeddings and the same FalkorDB vector index; the vector baseline takes the eight nearest chunks with their document metadata. Because Groq's free tier caps tokens per model per day, questions rotate across three models, and each question is answered by both systems with the same model.
 
-[Results table: per category, graph F1 vs vector F1, from eval/summary.json]
+<!-- EVAL:START -->
+Run in progress: 31 of 60 questions answered by both systems so far (the rest resume as each model's daily Groq cap refills). These numbers cover finished pairs only. Models: qwen/qwen3.8-27b (7 pairs), openai/gpt-oss-120b (24 pairs).
+
+| Category | Pairs | Graph agent F1 | Vector RAG F1 |
+|---|---|---|---|
+| Single-hop lookup (control) | 7 | 1.00 | 0.43 |
+| Expertise (PR to file to directory) | 7 | 0.76 | 0.00 |
+| Decision trace (issue to PR to release) | 5 | 0.80 | 0.00 |
+| Cross-repo connection | 4 | 1.00 | 0.00 |
+| Impact (open PRs under a directory) | 4 | 0.50 | 0.00 |
+| Aggregation (top reviewers or openers) | 4 | 1.00 | 0.00 |
+| **All** | **31** | **0.85** | **0.10** |
+
+The graph agent used about 5,721 tokens per answer against 1,533 for the baseline. 96 percent of the graph agent's citations were verified by a graph path. The vector baseline does best on single-hop lookup questions (F1 0.43), the control category where the answer sits in one document. Widest gap: cross-repo connection and aggregation. Every question, gold answer, raw answer and score is in [`eval/`](https://github.com/StarKnightt/threadline/tree/main/eval) and on [/eval](https://threadline-graph.vercel.app/eval).
+<!-- EVAL:END -->
 
 One honest detail from building the eval: the control category, "who opened the pull request titled X", depends heavily on phrasing for vector retrieval. With a question-first template the right chunk was in the top eight for 1 of 10 questions; with the title first, 6 of 10; with the bare title, 8 of 10. I used the title-first phrasing so the baseline gets a fair chance.
 
