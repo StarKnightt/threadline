@@ -69,7 +69,9 @@ async function main() {
                 : await runVectorBaseline(q.question, () => {}, { models: [MODEL] });
           } catch (e) {
             if (isCap(e) && WAIT) {
-              const ms = Math.min(waitMs(e) + 15000, 45 * 60000);
+              // A graph question makes several calls (about 8-10K tokens); waiting only for the next call's
+              // share lets a later call hit the cap and wastes the earlier ones, so wait for roughly an hour of refill.
+              const ms = Math.max(waitMs(e) + 15000, 60 * 60000);
               console.log(`${q.id} ${system}: daily cap for ${MODEL}, waiting ${Math.round(ms / 60000)} min`);
               await sleep(ms);
               attempt = 0;
