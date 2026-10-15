@@ -1,0 +1,640 @@
+{
+  "at": "2026-10-15T06:20:37.255Z",
+  "results": [
+    {
+      "name": "vectorEntry",
+      "ok": true,
+      "rows": 6,
+      "ms": 567,
+      "params": {
+        "vec": "[256-dim vector]",
+        "k": 16,
+        "limit": 6
+      },
+      "first": {
+        "key": "issue:FalkorDB/FalkorDB#804",
+        "labels": [
+          "Entity",
+          "Thread",
+          "Issue"
+        ],
+        "name": "Dedicated vector format",
+        "repo": "FalkorDB/FalkorDB",
+        "score": 0.435119450092316
+      }
+    },
+    {
+      "name": "fulltextEntry",
+      "ok": true,
+      "rows": 6,
+      "ms": 68,
+      "params": {
+        "text": "vector | index",
+        "limit": 6
+      },
+      "first": {
+        "key": "doc:docs:cypher/indexing/vector-index",
+        "labels": [
+          "Entity",
+          "Doc"
+        ],
+        "name": "Vector Indexing: Fast Similarity Search for GraphRAG",
+        "repo": null,
+        "score": 18
+      }
+    },
+    {
+      "name": "byKeys",
+      "ok": true,
+      "rows": 2,
+      "ms": 68,
+      "params": {
+        "keys": [
+          "person:swilly22",
+          "repo:FalkorDB/QueryWeaver"
+        ]
+      },
+      "first": {
+        "key": "repo:FalkorDB/QueryWeaver",
+        "labels": [
+          "Entity",
+          "Repo"
+        ],
+        "name": "QueryWeaver",
+        "repo": null
+      }
+    },
+    {
+      "name": "threadByNumber",
+      "ok": true,
+      "rows": 1,
+      "ms": 69,
+      "params": {
+        "number": 1000,
+        "repo": "FalkorDB"
+      },
+      "first": {
+        "key": "issue:FalkorDB/FalkorDB#1000",
+        "labels": [
+          "Entity",
+          "Thread",
+          "Issue"
+        ],
+        "name": "Remove Playwright tests from the CI build process",
+        "repo": "FalkorDB/FalkorDB",
+        "state": "OPEN"
+      }
+    },
+    {
+      "name": "conceptMatch",
+      "ok": true,
+      "rows": 1,
+      "ms": 68,
+      "params": {
+        "text": "vector index"
+      },
+      "first": {
+        "key": "concept:vector-index",
+        "labels": [
+          "Entity",
+          "Concept"
+        ],
+        "name": "vector index",
+        "repo": null
+      }
+    },
+    {
+      "name": "details",
+      "ok": true,
+      "rows": 1,
+      "ms": 70,
+      "params": {
+        "key": "pr:FalkorDB/FalkorDB#1461"
+      },
+      "first": {
+        "key": "pr:FalkorDB/FalkorDB#1461",
+        "labels": [
+          "Entity",
+          "Thread",
+          "PullRequest"
+        ],
+        "props": {
+          "additions": 154,
+          "baseRef": "master",
+          "changedFiles": 3,
+          "closedAt": 1765957508,
+          "commentCount": 2,
+          "createdAt": 1765911754,
+          "deletions": 104,
+          "key": "pr:FalkorDB/FalkorDB#1461",
+          "mergedAt": 1765957508,
+          "number": 1461,
+          "repo": "FalkorDB/FalkorDB",
+          "state": "MERGED",
+          "summary": "Resolves: 1454 Summary by CodeRabbit Refactor Centralized global lock handling through a single abstraction to standardize synchronization. Improved fork preparation and post-fork behavior to avoid redundant work and ensure safer state handling in parent/child processes. Reduced risk of lock-related issues across concurrent code paths by routing lock ops through the new abstraction. ✏️ Tip: You can customize this high-level summary in your review settings.",
+          "title": "recreate global lock on child fork, fixes #1462, fixes #1454",
+          "updatedAt": 1765957510,
+          "url": "https://github.com/FalkorDB/FalkorDB/pull/1461"
+        },
+        "degree": [
+          {
+            "rel": "AUTHORED",
+            "count": 1
+          },
+          {
+            "rel": "REVIEWED",
+            "count": 3
+          },
+          {
+            "rel": "COMMENTED_ON",
+            "count": 2
+          },
+          {
+            "rel": "REFERENCES",
+            "count": 2
+          },
+          {
+            "rel": "SHIPPED_IN",
+            "count": 1
+          },
+          {
+            "rel": "CLOSES",
+            "count": 2
+          },
+          {
+            "rel": "TOUCHED",
+            "count": 3
+          },
+          {
+            "rel": "IN_REPO",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "expand",
+      "ok": true,
+      "rows": 10,
+      "ms": 89,
+      "params": {
+        "key": "person:swilly22",
+        "types": [
+          "REVIEWED"
+        ],
+        "limit": 10
+      },
+      "first": {
+        "rel": "REVIEWED",
+        "outgoing": true,
+        "key": "pr:FalkorDB/FalkorDB#2944",
+        "labels": [
+          "Entity",
+          "Thread",
+          "PullRequest"
+        ],
+        "name": "test(slowlog): populate the slowlog serially",
+        "at": 1790496127
+      }
+    },
+    {
+      "name": "whoKnowsArea",
+      "ok": true,
+      "rows": 10,
+      "ms": 69,
+      "params": {
+        "term": "src/index",
+        "repo": "FalkorDB",
+        "now": 1792045233
+      },
+      "first": {
+        "key": "person:swilly22",
+        "person": "swilly22",
+        "area": "dir:FalkorDB/FalkorDB:src/index",
+        "path": "src/index",
+        "authored": 17,
+        "reviewed": 12,
+        "daysSinceLast": 0,
+        "score": 45.8758389061985
+      }
+    },
+    {
+      "name": "whoKnowsConcept",
+      "ok": true,
+      "rows": 10,
+      "ms": 108,
+      "params": {
+        "concept": "concept:vector-index",
+        "repo": null,
+        "now": 1792045233
+      },
+      "first": {
+        "key": "person:AviAvni",
+        "person": "AviAvni",
+        "area": "concept:vector-index",
+        "prs": 17,
+        "daysSinceLast": 3,
+        "score": 26.4846126798603,
+        "sample": [
+          "pr:FalkorDB/FalkorDB#1374",
+          "pr:FalkorDB/FalkorDB#765",
+          "pr:FalkorDB/FalkorDB#759"
+        ]
+      }
+    },
+    {
+      "name": "declaredOwners",
+      "ok": true,
+      "rows": 0,
+      "ms": 69,
+      "params": {
+        "areas": [
+          "dir:FalkorDB/FalkorDB:/",
+          "dir:FalkorDB/FalkorDB:src"
+        ]
+      },
+      "first": null
+    },
+    {
+      "name": "traceIssue",
+      "ok": true,
+      "rows": 1,
+      "ms": 69,
+      "params": {
+        "key": "issue:FalkorDB/FalkorDB#1462"
+      },
+      "first": {
+        "issue": "issue:FalkorDB/FalkorDB#1462",
+        "title": "Sometime fork child process is hung.",
+        "state": "CLOSED",
+        "openedBy": "barakb",
+        "fix": "pr:FalkorDB/FalkorDB#1461",
+        "fixTitle": "recreate global lock on child fork, fixes #1462, fixes #1454",
+        "mergedAt": 1765957508,
+        "linkSource": "connected",
+        "fixAuthor": "swilly22",
+        "release": "release:FalkorDB/FalkorDB@v4.14.10",
+        "tag": "v4.14.10",
+        "releasedAt": 1765969022
+      }
+    },
+    {
+      "name": "tracePr",
+      "ok": true,
+      "rows": 1,
+      "ms": 69,
+      "params": {
+        "key": "pr:FalkorDB/FalkorDB#1461"
+      },
+      "first": {
+        "pr": "pr:FalkorDB/FalkorDB#1461",
+        "title": "recreate global lock on child fork, fixes #1462, fixes #1454",
+        "state": "MERGED",
+        "mergedAt": 1765957508,
+        "author": "swilly22",
+        "closes": [
+          "issue:FalkorDB/FalkorDB#1462",
+          "issue:FalkorDB/FalkorDB#1454"
+        ],
+        "releases": [
+          "release:FalkorDB/FalkorDB@v4.14.10"
+        ],
+        "tags": [
+          "v4.14.10"
+        ],
+        "shipSource": [
+          "notes"
+        ],
+        "reviewers": [
+          {
+            "login": "coderabbitai",
+            "state": "COMMENTED"
+          },
+          {
+            "login": "overcut-ai",
+            "state": "CHANGES_REQUESTED"
+          },
+          {
+            "login": "barakb",
+            "state": "APPROVED"
+          }
+        ]
+      }
+    },
+    {
+      "name": "references",
+      "ok": true,
+      "rows": 3,
+      "ms": 70,
+      "params": {
+        "key": "issue:FalkorDB/FalkorDB#687"
+      },
+      "first": {
+        "rel": "REFERENCES",
+        "outgoing": false,
+        "key": "pr:FalkorDB/falkordb-browser#1918",
+        "name": "feat: guided CSV ingestion (preview, typed columns, result summary)",
+        "repo": "FalkorDB/falkordb-browser",
+        "state": "MERGED",
+        "crossRepo": true
+      }
+    },
+    {
+      "name": "connect",
+      "ok": true,
+      "rows": 3,
+      "ms": 85,
+      "params": {
+        "a": "pr:FalkorDB/falkordb-browser#1918",
+        "b": "person:swilly22"
+      },
+      "first": {
+        "keys": [
+          "pr:FalkorDB/falkordb-browser#1918",
+          "issue:FalkorDB/FalkorDB#385",
+          "person:swilly22"
+        ],
+        "rels": [
+          "REFERENCES",
+          "COMMENTED_ON"
+        ]
+      }
+    },
+    {
+      "name": "impactOpenPrs",
+      "ok": true,
+      "rows": 15,
+      "ms": 72,
+      "params": {
+        "term": "src/index",
+        "repo": "FalkorDB"
+      },
+      "first": {
+        "key": "pr:FalkorDB/FalkorDB#2527",
+        "name": "feat(index): the tag and geo kinds, and the xfail ledger closes",
+        "area": "graph/src/index",
+        "files": 16,
+        "createdAt": 1786881261
+      }
+    },
+    {
+      "name": "impactOpenIssues",
+      "ok": true,
+      "rows": 10,
+      "ms": 73,
+      "params": {
+        "term": "src/index",
+        "repo": "FalkorDB"
+      },
+      "first": {
+        "key": "issue:FalkorDB/FalkorDB#3134",
+        "name": "Rust - CCH implementation",
+        "area": "graph/src/index/cch",
+        "viaPrs": 5
+      }
+    },
+    {
+      "name": "coChanges",
+      "ok": true,
+      "rows": 8,
+      "ms": 68,
+      "params": {
+        "term": "src/index",
+        "repo": "FalkorDB"
+      },
+      "first": {
+        "key": "dir:FalkorDB/FalkorDB:tests/flow",
+        "name": "tests/flow",
+        "repo": "FalkorDB/FalkorDB",
+        "together": 27
+      }
+    },
+    {
+      "name": "activity.AUTHORED",
+      "ok": true,
+      "rows": 5,
+      "ms": 73,
+      "params": {
+        "repo": "falkordb-browser",
+        "since": 1735689600,
+        "until": 1767225600,
+        "limit": 5,
+        "kind": "issue"
+      },
+      "first": {
+        "key": "person:Naseem77",
+        "person": "Naseem77",
+        "n": 103,
+        "sample": [
+          "issue:FalkorDB/falkordb-browser#1333",
+          "issue:FalkorDB/falkordb-browser#1330",
+          "issue:FalkorDB/falkordb-browser#1324"
+        ]
+      }
+    },
+    {
+      "name": "activity.REVIEWED",
+      "ok": true,
+      "rows": 5,
+      "ms": 76,
+      "params": {
+        "repo": "falkordb-ts",
+        "since": 1735689600,
+        "until": 1767225600,
+        "limit": 5
+      },
+      "first": {
+        "key": "person:gkorland",
+        "person": "gkorland",
+        "n": 51,
+        "sample": [
+          "pr:FalkorDB/falkordb-ts#342",
+          "pr:FalkorDB/falkordb-ts#341",
+          "pr:FalkorDB/falkordb-ts#340"
+        ]
+      }
+    },
+    {
+      "name": "activity.MERGED",
+      "ok": true,
+      "rows": 5,
+      "ms": 83,
+      "params": {
+        "repo": "FalkorDB",
+        "since": 0,
+        "until": 4102444800,
+        "limit": 5
+      },
+      "first": {
+        "key": "person:swilly22",
+        "person": "swilly22",
+        "n": 171,
+        "sample": [
+          "pr:FalkorDB/FalkorDB#1449",
+          "pr:FalkorDB/FalkorDB#1448",
+          "pr:FalkorDB/FalkorDB#1440"
+        ]
+      }
+    },
+    {
+      "name": "activity.COMMENTED_ON",
+      "ok": true,
+      "rows": 5,
+      "ms": 102,
+      "params": {
+        "repo": null,
+        "since": 0,
+        "until": 4102444800,
+        "limit": 5
+      },
+      "first": {
+        "key": "person:gkorland",
+        "person": "gkorland",
+        "n": 1937,
+        "sample": [
+          "issue:FalkorDB/FalkorDB#93",
+          "issue:FalkorDB/FalkorDB#92",
+          "issue:FalkorDB/FalkorDB#89"
+        ]
+      }
+    },
+    {
+      "name": "pageRankReviewers",
+      "ok": true,
+      "rows": 10,
+      "ms": 69,
+      "params": {},
+      "first": {
+        "key": "person:AviAvni",
+        "person": "AviAvni",
+        "score": 0.000150251522427425
+      }
+    },
+    {
+      "name": "betweennessBridges",
+      "ok": true,
+      "rows": 10,
+      "ms": 74,
+      "params": {},
+      "first": {
+        "key": "person:barakb",
+        "person": "barakb",
+        "score": 91.3969239874931,
+        "repos": [
+          "FalkorDB-MCPServer",
+          "falkordb-ts",
+          "GraphRAG-SDK",
+          "QueryWeaver",
+          "falkordb-browser",
+          "FalkorDB"
+        ]
+      }
+    },
+    {
+      "name": "subsystems",
+      "ok": true,
+      "rows": 8,
+      "ms": 735,
+      "params": {},
+      "first": {
+        "communityId": 26049,
+        "keys": [
+          "dir:FalkorDB/FalkorDB:graph/src/effects/v3",
+          "dir:FalkorDB/FalkorDB:graph/src/effects",
+          "dir:FalkorDB/FalkorDB:build/runtime",
+          "dir:FalkorDB/FalkorDB:graph/src/graph/graph",
+          "dir:FalkorDB/FalkorDB:.github/codeql",
+          "dir:FalkorDB/FalkorDB:src/serializers/decoders/prev/v19",
+          "dir:FalkorDB/FalkorDB:src/serializers/decoders/current/v20",
+          "dir:FalkorDB/FalkorDB:bench/tests"
+        ],
+        "paths": [
+          "FalkorDB/FalkorDB:graph/src/effects/v3",
+          "FalkorDB/FalkorDB:graph/src/effects",
+          "FalkorDB/FalkorDB:build/runtime",
+          "FalkorDB/FalkorDB:graph/src/graph/graph",
+          "FalkorDB/FalkorDB:.github/codeql",
+          "FalkorDB/FalkorDB:src/serializers/decoders/prev/v19",
+          "FalkorDB/FalkorDB:src/serializers/decoders/current/v20",
+          "FalkorDB/FalkorDB:bench/tests"
+        ],
+        "size": 134
+      }
+    },
+    {
+      "name": "verifyPath",
+      "ok": true,
+      "rows": 1,
+      "ms": 71,
+      "params": {
+        "entry": "concept:vector-index",
+        "cited": "person:swilly22"
+      },
+      "first": {
+        "hops": 2,
+        "keys": [
+          "concept:vector-index",
+          "pr:FalkorDB/FalkorDB#2581",
+          "person:swilly22"
+        ],
+        "rels": [
+          "MENTIONS",
+          "MERGED"
+        ]
+      }
+    },
+    {
+      "name": "neighbourhood",
+      "ok": true,
+      "rows": 40,
+      "ms": 93,
+      "params": {
+        "key": "repo:FalkorDB/falkordb-ts"
+      },
+      "first": {
+        "key": "issue:FalkorDB/falkordb-ts#226",
+        "rel": "IN_REPO",
+        "outgoing": false,
+        "hop2": [
+          {
+            "r": "MENTIONS",
+            "k": "concept:unwind",
+            "out": true
+          },
+          {
+            "r": "MENTIONS",
+            "k": "concept:explain-profile",
+            "out": true
+          },
+          {
+            "r": "AUTHORED",
+            "k": "person:Naseem77",
+            "out": false
+          },
+          {
+            "r": "ASSIGNED_TO",
+            "k": "person:Naseem77",
+            "out": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "vectorRag",
+      "ok": true,
+      "rows": 8,
+      "ms": 70,
+      "params": {
+        "vec": "[256-dim vector]",
+        "k": 8
+      },
+      "first": {
+        "chunk": "chunk:pr:FalkorDB/falkordb-ts#185:0",
+        "text": "Fix #184 add vector parser. Summary by CodeRabbit - New Features - Introduced support for a new vector data type ( VECTORF32 ) in graph queries, enhancing data representation capabilities. - Tests - Added new test cases to validate the functionality of querying vector values in the Graph class.",
+        "key": "pr:FalkorDB/falkordb-ts#185",
+        "name": "Fix #184 add vector parser",
+        "score": 0.425468385219574
+      }
+    }
+  ]
+}

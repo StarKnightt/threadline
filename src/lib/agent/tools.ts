@@ -78,7 +78,8 @@ async function step(
     };
     ctx.steps.push(s);
     ctx.emit({ type: "step_result", ...s });
-    return { rows: compact(rows), ...(out.note ? { note: out.note } : {}) };
+    const forModel = compact(rows, 10).map(({ labels: _l, ...r }) => r); // eslint-disable-line @typescript-eslint/no-unused-vars
+    return { rows: forModel, ...(out.note ? { note: out.note } : {}) };
   } catch (e) {
     const msg = (e as Error).message.slice(0, 300);
     const s: TraceStep = { step: n, tool: name, args, queries: [], ms: Date.now() - t, refs: [], edges: [], rows: [], error: msg };
@@ -131,20 +132,23 @@ export function makeTools(ctx: ToolCtx) {
             runs.push(r);
             add(r.rows, "key");
           }
-          const c = await run(Q.conceptMatch, { text: text.trim().slice(0, 60) });
-          runs.push(c);
-          add(c.rows, "concept");
-          const ft = ftText(text);
-          if (ft) {
-            const r = await run(Q.fulltextEntry, { text: ft, limit: 6 });
-            runs.push(r);
-            add(r.rows, "fulltext");
+          const words = text.replace(/\b(?:pr|issue|person|file|dir|release|doc|concept|repo):[^\s,;]+/g, " ").replace(/@[\w-]+/g, " ").trim();
+          if (words.length >= 3) {
+            const c = await run(Q.conceptMatch, { text: words.slice(0, 60) });
+            runs.push(c);
+            add(c.rows, "concept");
+            const ft = ftText(words);
+            if (ft) {
+              const r = await run(Q.fulltextEntry, { text: ft, limit: 6 });
+              runs.push(r);
+              add(r.rows, "fulltext");
+            }
+            const vec = await embedQuestion(words);
+            const v = await run(Q.vectorEntry, { vec, k: 16, limit: 6 });
+            runs.push(v);
+            add(v.rows, "vector");
           }
-          const vec = await embedQuestion(text);
-          const v = await run(Q.vectorEntry, { vec, k: 16, limit: 6 });
-          runs.push(v);
-          add(v.rows, "vector");
-          return { runs, rows: [...found.values()].slice(0, 14) };
+          return { runs, rows: [...found.values()].slice(0, 12) };
         }),
     }),
 
@@ -183,16 +187,29 @@ export function makeTools(ctx: ToolCtx) {
           const runs: Run[] = [];
           const rows: Row[] = [];
           const edges: TraceEdge[] = [];
-          if (area.startsWith("concept:")) {
-            const r = await run(Q.whoKnowsConcept, { concept: area, repo: repo ?? null, now: ctx.now });
+          let concept = area.startsWith("concept:") ? area : null;
+          if (!concept && !/[/:.]/.test(area)) {
+            const c = await run(Q.conceptMatch, { text: area.trim().slice(0, 60) });
+            runs.push(c);
+            concept = (c.rows[0]?.key as string) ?? null;
+          }
+          if (concept) {
+            const r = await run(Q.whoKnowsConcept, { concept, repo: repo ?? null, now: ctx.now });
             runs.push(r);
             for (const x of r.rows) {
               rows.push({ ...x, via: "concept" });
-              for (const s of (x.sample as string[]) ?? []) edges.push([x.key as string, "AUTHORED|REVIEWED", s], [s, "MENTIONS", area]);
+              for (const s of (x.sample as string[]) ?? []) edges.push([x.key as string, "AUTHORED|REVIEWED", s], [s, "MENTIONS", concept]);
             }
-          } else {
-            const term = area.replace(/^(dir|file):[^:]+:/, "");
-            const r = await run(Q.whoKnowsArea, { term, repo: repo ?? null, now: ctx.now });
+          }
+          if (!area.startsWith("concept:")) {
+            const base = area.replace(/^(dir|file):[^:]+:/, "").trim();
+            const words = base.split(/\s+/).filter((w) => w.length > 2 && !STOP.has(w.toLowerCase()));
+            const terms = [...new Set([base, base.replace(/\s+/g, "_"), ...words.reverse()])];
+            let r = await run(Q.whoKnowsArea, { term: terms[0], repo: repo ?? null, now: ctx.now });
+            for (const term of terms.slice(1)) {
+              if (r.rows.length) break;
+              r = await run(Q.whoKnowsArea, { term, repo: repo ?? null, now: ctx.now });
+            }
             runs.push(r);
             for (const x of r.rows) {
               rows.push({ ...x, via: "KNOWS" });

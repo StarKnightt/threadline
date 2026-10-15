@@ -13,7 +13,9 @@
     "ingest:embed": "tsx scripts/embed.ts",
     "ingest:load": "tsx scripts/load.ts",
     "eval:gold": "tsx eval/gold.ts",
-    "eval:run": "tsx --conditions=react-server eval/run.ts"
+    "eval:run": "tsx --conditions=react-server eval/run.ts",
+    "verify:cypher": "tsx scripts/verify-cypher.ts",
+    "ask": "tsx --conditions=react-server scripts/ask.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.61",

@@ -38,14 +38,14 @@ RETURN n.key AS key, labels(n) AS labels, properties(n) AS props, collect({rel: 
 
   /** One hop out from a node, optionally restricted to relationship types, newest first. */
   expand: `MATCH (s:Entity {key: $key})-[r]-(n:Entity)
-WHERE size($types) = 0 OR type(r) IN $types
+WHERE (size($types) = 0 OR type(r) IN $types) AND coalesce(n.isBot, false) = false
 RETURN type(r) AS rel, id(startNode(r)) = id(s) AS outgoing, n.key AS key, labels(n) AS labels, ${NAME} AS name,
        coalesce(n.mergedAt, n.createdAt, n.publishedAt, n.lastSeenAt, 0) AS at
 ORDER BY at DESC LIMIT $limit`,
 
   /** Q4a: who knows a directory or file area, from derived KNOWS edges with recency decay (half-life about 4 months). */
   whoKnowsArea: `MATCH (d:Directory)
-WHERE d.depth > 0 AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
+WHERE d.depth > 0 AND NOT d.path STARTS WITH '.' AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
 WITH d ORDER BY d.depth ASC LIMIT 4
 MATCH (p:Person)-[k:KNOWS]->(d)
 WITH p, d, k, (2 * k.authored + k.reviewed) AS weight, ($now - k.lastAt) / 86400.0 AS ageDays
@@ -103,7 +103,7 @@ LIMIT 3`,
 
   /** Q7a: impact. Open PRs touching files under an area. */
   impactOpenPrs: `MATCH (d:Directory)
-WHERE d.depth > 0 AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
+WHERE d.depth > 0 AND NOT d.path STARTS WITH '.' AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
 WITH d ORDER BY d.depth ASC LIMIT 3
 MATCH (d)<-[:IN_DIR*1..6]-(f:File)<-[t:TOUCHED]-(pr:PullRequest)
 WHERE pr.state = 'OPEN'
@@ -112,7 +112,7 @@ ORDER BY files DESC LIMIT 15`,
 
   /** Q7b: impact. Open issues connected to past fixes in the area (fixed by a PR that touched it, then referenced again). */
   impactOpenIssues: `MATCH (d:Directory)
-WHERE d.depth > 0 AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
+WHERE d.depth > 0 AND NOT d.path STARTS WITH '.' AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
 WITH d ORDER BY d.depth ASC LIMIT 3
 MATCH (d)<-[:IN_DIR*1..6]-(:File)<-[:TOUCHED]-(pr:PullRequest)-[:CLOSES|REFERENCES]-(i:Issue)
 WHERE i.state = 'OPEN'
@@ -121,7 +121,7 @@ ORDER BY viaPrs DESC LIMIT 10`,
 
   /** Q7c: impact. Directories that usually change together with the area (derived CO_CHANGES). */
   coChanges: `MATCH (d:Directory)
-WHERE d.depth > 0 AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
+WHERE d.depth > 0 AND NOT d.path STARTS WITH '.' AND toLower(d.path) CONTAINS toLower($term) AND ($repo IS NULL OR toLower(d.repo) ENDS WITH toLower($repo))
 WITH d ORDER BY d.depth ASC LIMIT 3
 MATCH (d)-[c:CO_CHANGES]-(o:Directory)
 RETURN o.key AS key, o.path AS name, o.repo AS repo, c.count AS together
@@ -155,7 +155,7 @@ RETURN node.key AS key, node.login AS person, score
 ORDER BY score DESC LIMIT 10`,
 
   /** Q9: bridges between repos. Betweenness centrality over people and the repos they contribute to. */
-  betweennessBridges: `CALL algo.betweenness({nodeLabels: ['Person', 'Repo'], relationshipTypes: ['CONTRIBUTES_TO']}) YIELD node, score
+  betweennessBridges: `CALL algo.betweenness({nodeLabels: ['Person', 'Repo'], relationshipTypes: ['CONTRIBUTES_TO', 'HAS_CONTRIBUTOR']}) YIELD node, score
 WITH node, score WHERE node:Person
 MATCH (node)-[c:CONTRIBUTES_TO]->(r:Repo)
 RETURN node.key AS key, node.login AS person, score, collect(r.name) AS repos
@@ -169,10 +169,12 @@ RETURN communityId, [d IN dirs | d.key][0..8] AS keys, [d IN dirs | d.repo + ':'
 ORDER BY size DESC LIMIT 8`,
 
   /** Q12: verifier. Is the cited node reachable from the entry node within 4 hops (any direction)? */
+  // shortestPath() is directed-only in FalkorDB and must sit in WITH/RETURN; allShortestPaths() in MATCH handles undirected.
   verifyPath: `MATCH (a:Entity {key: $entry}), (b:Entity {key: $cited})
 WITH a, b
-MATCH p = shortestPath((a)-[*..4]-(b))
-RETURN length(p) AS hops, [n IN nodes(p) | n.key] AS keys, [r IN relationships(p) | type(r)] AS rels`,
+MATCH p = allShortestPaths((a)-[:AUTHORED|REVIEWED|MERGED|COMMENTED_ON|ASSIGNED_TO|TOUCHED|IN_DIR|CLOSES|REFERENCES|SHIPPED_IN|MENTIONS|DOCUMENTS|KNOWS|REVIEWS_FOR|CO_CHANGES|DECLARED_OWNER*..4]-(b))
+RETURN length(p) AS hops, [n IN nodes(p) | n.key] AS keys, [r IN relationships(p) | type(r)] AS rels
+LIMIT 1`,
 
   /** Neighbourhood for the 3D viewer (two hops, capped). */
   neighbourhood: `MATCH (s:Entity {key: $key})-[r1]-(n1:Entity)

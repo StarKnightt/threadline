@@ -60,6 +60,14 @@ MERGE (p)-[c:CONTRIBUTES_TO]->(r)
 SET c.reviews = n, c.prs = coalesce(c.prs, 0), c.issues = coalesce(c.issues, 0)`,
   },
   {
+    // Betweenness follows edge direction, so bridges need the reverse edge too (repo -> person).
+    name: "HAS_CONTRIBUTOR",
+    cypher: `MATCH (p:Person)-[c:CONTRIBUTES_TO]->(r:Repo)
+WHERE coalesce(c.prs, 0) + coalesce(c.reviews, 0) >= 3
+MERGE (r)-[h:HAS_CONTRIBUTOR]->(p)
+SET h.weight = coalesce(c.prs, 0) + coalesce(c.reviews, 0)`,
+  },
+  {
     name: "CO_CHANGES",
     cypher: `MATCH (pr:PullRequest)-[:TOUCHED]->(:File)-[:IN_DIR]->(d:Directory)
 WITH pr, collect(DISTINCT d) AS ds

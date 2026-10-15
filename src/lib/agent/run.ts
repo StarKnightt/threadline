@@ -12,18 +12,23 @@ export const MODELS = (process.env.TL_MODELS ?? "openai/gpt-oss-120b,openai/gpt-
 
 export type MemoryContext = { facts: string[]; previous?: { question: string; refs: string[] }; playbook?: { questionType: string; toolSequence: string } };
 
-const CITE_RE = /\[((?:pr|issue|person|file|dir|release|doc|concept|repo|label):[^\]\s]+)\]/g;
+const CITE_RE = /\b((?:pr|issue|person|file|dir|release|doc|concept|repo|label):[^\s\]\[;,()]+)/g;
 
 function systemPrompt(now: number, mem?: MemoryContext) {
   const lines = [
     "You are Threadline, a company brain for the FalkorDB open-source organisation.",
     "The knowledge graph holds public GitHub data: repos, people (GitHub logins), issues, pull requests, reviews, files, directories, releases, docs and concepts.",
     `Today is ${new Date(now * 1000).toISOString().slice(0, 10)}.`,
+    "Plans that work (2 to 4 tool calls):",
+    "- Who knows / who should review an area: find_entities, then who_knows with the concept key (concept:...) or a path fragment such as src/index.",
+    "- What fixed issue #N / which release shipped it / what references it: find_entities with number and repo, then trace on the issue or PR key.",
+    "- What is affected by changing an area / open PRs touching a path: impact with the path fragment.",
+    "- Who did the most X in a repo or year: activity (metric AUTHORED with kind pr or issue, REVIEWED, MERGED, COMMENTED_ON; since/until as YYYY-MM-DD).",
+    "- How two things relate: find_entities for each, then connect. Org-wide influence: rank.",
     "Rules:",
-    "- Call find_entities first to resolve the question to node keys.",
-    "- Prefer the typed tools (who_knows, trace, impact, activity, connect, rank, expand, details). Use cypher_readonly only when nothing else fits.",
-    "- Use at most 6 tool calls, then answer.",
-    "- Cite the node key behind every factual claim in square brackets, for example [pr:FalkorDB/FalkorDB#1234] or [person:swilly22]. Only cite keys that appeared in tool results.",
+    "- Prefer the typed tools. Use cypher_readonly only when nothing else fits.",
+    "- Use at most 5 tool calls, then answer.",
+    "- Cite the node key behind every factual claim in square brackets, for example [pr:FalkorDB/FalkorDB#1234] or [person:swilly22]. Only cite full node keys that appeared in tool results, never tool names.",
     "- If the graph has no evidence, say so plainly. Do not guess.",
     "- Answer in under 150 words of plain prose or a short list. End with one line: ANSWER: item; item; item (the key entities as logins, issue or PR numbers like #123, or release tags).",
   ];
@@ -53,7 +58,7 @@ async function generateWithFallback(opts: Omit<Parameters<typeof generateText>[0
 }
 
 export function citedKeys(answer: string) {
-  return [...new Set([...answer.matchAll(CITE_RE)].map((m) => m[1]))];
+  return [...new Set([...answer.matchAll(CITE_RE)].map((m) => m[1].replace(/[.:]+$/, "")))];
 }
 
 /** Deterministic verifier: each citation must have been observed in a tool result and be reachable from an entry node. */
@@ -63,8 +68,12 @@ export async function verify(steps: TraceStep[], answer: string, emit: (e: Recor
     s.refs.forEach((r) => observed.add(r));
     s.edges.forEach(([a, , b]) => (observed.add(a), observed.add(b)));
   }
+  // Entry nodes: what the investigation started from (resolved entities, keys the agent passed in, and the anchor areas it resolved).
   const first = steps.find((s) => s.tool === "find_entities" && !s.error);
-  const entry = (first?.rows ?? []).map((r) => r.key as string).filter((k) => k && KEY_RE.test(k)).slice(0, 4);
+  const fromFind = (first?.rows ?? []).map((r) => r.key as string).filter((k) => k && KEY_RE.test(k)).slice(0, 4);
+  const fromArgs = steps.flatMap((s) => Object.values(s.args).flat().filter((v): v is string => typeof v === "string" && KEY_RE.test(v)));
+  const anchors = steps.filter((s) => s.agent !== "verifier" && !s.error).slice(0, 2).flatMap((s) => s.refs.filter((r) => /^(concept|dir|file|repo|issue|pr):/.test(r)).slice(0, 3));
+  const entry = [...new Set([...fromFind, ...fromArgs, ...anchors])].slice(0, 6);
   const cited = citedKeys(answer).slice(0, 12);
   const citations: Citation[] = [];
   const t0 = Date.now();
@@ -113,7 +122,7 @@ export async function runGraphAgent(question: string, emit: (e: Record<string, u
   const ctx: ToolCtx = { now, steps: [], emit };
   const tools = makeTools(ctx);
   const messages: ModelMessage[] = [{ role: "user", content: question }];
-  const { res, model } = await generateWithFallback({ system: systemPrompt(now, mem), messages, tools, stopWhen: isStepCount(8), maxOutputTokens: 1400, temperature: 0 }, opts.models);
+  const { res, model } = await generateWithFallback({ system: systemPrompt(now, mem), messages, tools, stopWhen: isStepCount(6), maxOutputTokens: 1400, temperature: 0 }, opts.models);
   let answer = res.text.trim();
   let tokens = res.usage?.totalTokens ?? 0;
   if (!answer) answer = "I could not finish an answer within the step budget. The trace above shows what the graph returned.";
@@ -135,6 +144,8 @@ export async function runGraphAgent(question: string, emit: (e: Record<string, u
             ...res.response.messages,
             { role: "user", content: `Verifier: ${reason}. Rewrite the answer using only keys that appeared in tool results. Remove claims you cannot support. Keep the ANSWER line.` },
           ],
+          tools,
+          toolChoice: "none",
           maxOutputTokens: 700,
           temperature: 0,
         },
@@ -148,8 +159,8 @@ export async function runGraphAgent(question: string, emit: (e: Record<string, u
         verification = await verify(ctx.steps, answer, emit);
         verification.handoff = { reason, rejected };
       }
-    } catch {
-      /* keep the first answer if the revision call fails */
+    } catch (e) {
+      console.warn("handoff revision failed:", (e as Error).message.slice(0, 200));
     }
   }
 
