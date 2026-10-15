@@ -1,24 +1,150 @@
 @import "tailwindcss";
 
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-canvas: var(--tl-bg);
+  --color-gold: var(--tl-gold);
+  --color-accent: var(--tl-accent);
+  --color-accent-hover: var(--tl-accent-hover);
+  --color-on-accent: #fff;
+  --color-surface: var(--tl-surface);
+  --color-graph: var(--tl-graph);
+  --color-vector: var(--tl-vector);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Dark (default). Muted slate steps are lifted so small text clears WCAG AA on the near-black canvas. */
+:root {
+  color-scheme: dark;
+  --tl-bg: #05060a;
+  --tl-surface: rgba(255, 255, 255, 0.025);
+  --tl-fg: #e2e8f0;
+  --tl-gold: #ffd166;
+  --tl-accent: #7c3aed;
+  --tl-accent-hover: #8b5cf6;
+  --tl-graph: #a78bfa;
+  --tl-vector: #f472b6;
+  --tl-label-bg: rgba(5, 6, 10, 0.74);
+  --tl-label-fg: #e2e8f0;
+  --tl-label-strong: #ffd166;
+  --tl-label-glow: rgba(255, 209, 102, 0.35);
+  --tl-scroll: rgba(255, 255, 255, 0.12);
+  --tl-selection: rgba(167, 139, 250, 0.35);
+  --tl-stage: radial-gradient(ellipse at 50% 40%, #0b0d16 0%, #05060a 70%);
+  --color-slate-500: oklch(65% 0.04 257);
+  --color-slate-600: oklch(57% 0.045 257);
+}
+
+/* Light: the slate and accent scales are mirrored (300 <-> 700 and so on), white and black swap,
+   so text that was light-on-dark becomes dark-on-light with the same hierarchy. */
+[data-theme="light"] {
+  color-scheme: light;
+  --tl-bg: #fbfbfd;
+  --tl-surface: #ffffff;
+  --tl-fg: #0f172a;
+  --tl-gold: #8a5a00;
+  --tl-accent: #6d28d9;
+  --tl-accent-hover: #5b21b6;
+  --tl-graph: #7c3aed;
+  --tl-vector: #db2777;
+  --tl-label-bg: rgba(255, 255, 255, 0.9);
+  --tl-label-fg: #0f172a;
+  --tl-label-strong: #7a4f00;
+  --tl-label-glow: rgba(201, 138, 0, 0.28);
+  --tl-scroll: rgba(15, 23, 42, 0.18);
+  --tl-selection: rgba(124, 58, 237, 0.2);
+  --tl-stage: radial-gradient(ellipse at 50% 40%, #ffffff 0%, #f1f3f9 60%, #e8ebf4 100%);
+
+  --color-white: oklch(18% 0.035 265);
+  --color-black: #fff;
+
+  --color-slate-50: oklch(12.9% 0.042 264.695);
+  --color-slate-100: oklch(20.8% 0.042 265.755);
+  --color-slate-200: oklch(27.9% 0.041 260.031);
+  --color-slate-300: oklch(37.2% 0.044 257.287);
+  --color-slate-400: oklch(44.6% 0.043 257.281);
+  --color-slate-500: oklch(50% 0.045 257);
+  --color-slate-600: oklch(58% 0.04 257);
+  --color-slate-700: oklch(70.4% 0.04 256.788);
+  --color-slate-800: oklch(86.9% 0.022 252.894);
+  --color-slate-900: oklch(92.9% 0.013 255.508);
+  --color-slate-950: oklch(96.8% 0.007 247.896);
+
+  --color-violet-200: oklch(43.2% 0.232 292.759);
+  --color-violet-300: oklch(49.1% 0.27 292.581);
+  --color-violet-400: oklch(54.1% 0.281 293.009);
+
+  --color-sky-200: oklch(44.3% 0.11 240.79);
+  --color-sky-300: oklch(50% 0.134 242.749);
+  --color-sky-400: oklch(58.8% 0.158 241.966);
+
+  --color-rose-200: oklch(45.5% 0.188 13.697);
+  --color-rose-300: oklch(51.4% 0.222 16.935);
+  --color-rose-400: oklch(58.6% 0.253 17.585);
+
+  --color-emerald-200: oklch(43.2% 0.095 166.913);
+  --color-emerald-300: oklch(47% 0.11 165.612);
+  --color-emerald-400: oklch(59.6% 0.145 163.225);
+
+  --color-amber-200: oklch(41.4% 0.112 45.904);
+  --color-amber-300: oklch(47.3% 0.137 46.201);
+  --color-amber-400: oklch(66.6% 0.179 58.318);
+
+  --color-pink-200: oklch(45.9% 0.187 3.815);
+  --color-pink-300: oklch(52.5% 0.223 3.958);
+  --color-pink-400: oklch(59.2% 0.249 0.584);
 }
 
 html,
 body {
-  background: #05060a;
-  color: #e2e8f0;
+  background: var(--tl-bg);
+  color: var(--tl-fg);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
 ::selection {
-  background: rgba(167, 139, 250, 0.35);
+  background: var(--tl-selection);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  scrollbar-color: var(--tl-scroll) transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--tl-graph);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.tl-stage {
+  background: var(--tl-stage);
+}
+
+.tl-press {
+  transition-property: transform, background-color, border-color, color, opacity;
+  transition-duration: 160ms;
+  transition-timing-function: var(--ease-out-strong);
+}
+.tl-press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+[data-theme="light"] .bg-surface {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+@keyframes tl-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.tl-in {
+  animation: tl-in 220ms var(--ease-out-strong);
 }
 
 .tl-label {
@@ -26,8 +152,8 @@ body {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10.5px;
   line-height: 1;
-  color: #e2e8f0;
-  background: rgba(5, 6, 10, 0.72);
+  color: var(--tl-label-fg);
+  background: var(--tl-label-bg);
   border: 1px solid;
   border-radius: 4px;
   padding: 3px 5px;
@@ -36,9 +162,10 @@ body {
 }
 
 .tl-label-strong {
-  color: #ffd166;
-  border-color: #ffd166 !important;
-  box-shadow: 0 0 12px rgba(255, 209, 102, 0.35);
+  color: var(--tl-label-strong);
+  border-color: var(--tl-label-strong) !important;
+  box-shadow: 0 0 12px var(--tl-label-glow);
+  font-weight: 600;
 }
 
 @media (prefers-reduced-motion: reduce) {

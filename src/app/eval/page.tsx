@@ -2,12 +2,14 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = { title: "Evaluation: graph agent vs vector RAG | Threadline" };
 
 type Stats = { n: number; f1: number; precision: number; recall: number; exact: number; tokens: number; p50ms: number; p95ms: number; steps: number; citationValidity: number | null; fullyGrounded: number | null };
-type Summary = { model: string; generatedAt: string; pairedQuestions: number; overall: { graph: Stats; vector: Stats }; categories: Record<string, { graph: Stats; vector: Stats }> };
-type Row = { id: string; category: string; system: string; question: string; gold: string[]; pred: string[]; f1: number; answer: string; tokens: number; ms: number; verified: string | null; tools: string[] };
+type Pair = { graph: Stats; vector: Stats };
+type Summary = { model: string; generatedAt: string; pairedQuestions: number; totalQuestions?: number; overall: Pair; models?: Record<string, Pair>; categories: Record<string, Pair> };
+type Row = { id: string; category: string; system: string; model: string; question: string; gold: string[]; pred: string[]; f1: number; answer: string; tokens: number; ms: number; verified: string | null; tools: string[] };
 
 const LABELS: Record<string, { name: string; about: string }> = {
   lookup: { name: "Single-hop lookup (control)", about: "Who opened a PR, given its title. The answer sits in one document, so vector retrieval should cope." },
@@ -40,11 +42,21 @@ export default function EvalPage() {
   try {
     rows = readFileSync(join(process.cwd(), "eval/results.jsonl"), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
   } catch {}
-  const ids = [...new Set(rows.map((r) => r.id))].filter((id) => rows.some((r) => r.id === id && r.system === "graph") && rows.some((r) => r.id === id && r.system === "vector"));
+  const ids = [...new Set(rows.map((r) => r.id))]
+    .filter((id) => rows.some((r) => r.id === id && r.system === "graph") && rows.some((r) => r.id === id && r.system === "vector"))
+    .sort((a, b) => {
+      const order = Object.keys(LABELS);
+      const ca = order.indexOf(a.replace(/-\d+$/, ""));
+      const cb = order.indexOf(b.replace(/-\d+$/, ""));
+      return ca - cb || a.localeCompare(b, "en", { numeric: true });
+    });
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10 text-slate-300">
-      <Link href="/" className="text-[12px] text-slate-500 hover:text-white">← Threadline</Link>
+      <div className="flex items-center gap-3">
+        <Link href="/" className="text-[12px] text-slate-500 hover:text-white">← Threadline</Link>
+        <ThemeToggle className="ml-auto" />
+      </div>
       <h1 className="mt-3 text-2xl font-semibold tracking-tight text-white">Graph agent vs vector RAG</h1>
       <p className="mt-3 max-w-3xl text-[14px] leading-relaxed">
         60 questions in six categories, generated from templates over the raw GitHub JSON. Gold answers are computed by <code className="text-slate-200">eval/gold.ts</code> directly from that JSON, without FalkorDB, so the graph never grades itself. Both systems use the same language model, the same 256-dimension embeddings and the same FalkorDB vector index. The vector baseline embeds the question, takes the 8 nearest chunks (with each chunk&apos;s document title, author, state and date) and answers from them. Scores are set-based F1 over the entities in each answer&apos;s final ANSWER line.
@@ -52,11 +64,16 @@ export default function EvalPage() {
       {s ? (
         <>
           <div className="mt-2 font-mono text-[11px] text-slate-500">
-            model {s.model} · {s.pairedQuestions} paired questions · generated {s.generatedAt.slice(0, 16).replace("T", " ")} UTC
+            {s.pairedQuestions} of {s.totalQuestions ?? 60} questions answered by both systems · generated {s.generatedAt.slice(0, 16).replace("T", " ")} UTC
           </div>
+          {s.pairedQuestions < (s.totalQuestions ?? 60) && (
+            <p className="mt-2 max-w-3xl text-[12.5px] text-slate-400">
+              The run is still in progress: questions rotate across three Groq models because each model has its own daily token cap, and the remaining questions resume as that cap refills. Numbers below cover only finished pairs.
+            </p>
+          )}
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {(["graph", "vector"] as const).map((k) => (
-              <div key={k} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5">
+              <div key={k} className="rounded-xl border border-white/[0.07] bg-surface p-5">
                 <div className={`text-[11px] uppercase tracking-wider ${k === "graph" ? "text-violet-300" : "text-pink-300"}`}>{k === "graph" ? "Threadline graph agent" : "Vector RAG baseline"}</div>
                 <div className="mt-1 text-4xl font-semibold text-white">{s.overall[k].f1.toFixed(2)}<span className="ml-2 text-sm font-normal text-slate-500">mean F1</span></div>
                 <div className="mt-3 grid grid-cols-3 gap-2 font-mono text-[11px] text-slate-400">
@@ -69,6 +86,39 @@ export default function EvalPage() {
             ))}
           </div>
 
+          {s.models && (
+            <>
+              <h2 className="mt-10 text-lg font-semibold text-white">By model</h2>
+              <p className="mt-1 text-[12.5px] text-slate-500">Questions are assigned round-robin to three models; both systems always answer a given question with the same model.</p>
+              <div className="mt-3 overflow-x-auto rounded-xl border border-white/[0.06]">
+                <table className="w-full text-left text-[12.5px]">
+                  <thead className="text-[11px] uppercase tracking-wider text-slate-500">
+                    <tr className="border-b border-white/[0.06]">
+                      <th className="p-2.5 font-medium">Model</th>
+                      <th className="p-2.5 font-medium">Pairs</th>
+                      <th className="p-2.5 font-medium text-violet-300">Graph F1</th>
+                      <th className="p-2.5 font-medium text-pink-300">Vector F1</th>
+                      <th className="p-2.5 font-medium">Graph tok/answer</th>
+                      <th className="p-2.5 font-medium">Vector tok/answer</th>
+                    </tr>
+                  </thead>
+                  <tbody className="font-mono text-[12px] text-slate-300">
+                    {Object.entries(s.models).map(([m, v]) => (
+                      <tr key={m} className="border-b border-white/[0.04] last:border-0">
+                        <td className="p-2.5">{m}</td>
+                        <td className="p-2.5">{v.graph.n}</td>
+                        <td className="p-2.5">{v.graph.f1.toFixed(2)}</td>
+                        <td className="p-2.5">{v.vector.f1.toFixed(2)}</td>
+                        <td className="p-2.5">{Math.round(v.graph.tokens).toLocaleString()}</td>
+                        <td className="p-2.5">{Math.round(v.vector.tokens).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
           <h2 className="mt-10 text-lg font-semibold text-white">By category</h2>
           <div className="mt-4 space-y-4">
             {Object.entries(s.categories).map(([c, v]) => (
@@ -80,10 +130,10 @@ export default function EvalPage() {
                 </div>
                 <div className="mt-3 grid grid-cols-[110px_1fr_48px] items-center gap-x-3 gap-y-2 text-[12px]">
                   <span className="text-violet-300">Graph agent</span>
-                  <Bar v={v.graph.f1} color="#a78bfa" />
+                  <Bar v={v.graph.f1} color="var(--tl-graph)" />
                   <span className="font-mono text-slate-300">{v.graph.f1.toFixed(2)}</span>
                   <span className="text-pink-300">Vector RAG</span>
-                  <Bar v={v.vector.f1} color="#f472b6" />
+                  <Bar v={v.vector.f1} color="var(--tl-vector)" />
                   <span className="font-mono text-slate-300">{v.vector.f1.toFixed(2)}</span>
                 </div>
               </div>
@@ -101,7 +151,7 @@ export default function EvalPage() {
           const g = rows.find((r) => r.id === id && r.system === "graph")!;
           const v = rows.find((r) => r.id === id && r.system === "vector")!;
           return (
-            <details key={id} className="rounded-lg border border-white/[0.06] p-3 open:bg-white/[0.02]">
+            <details key={id} className="rounded-lg border border-white/[0.06] p-3 open:bg-surface">
               <summary className="cursor-pointer list-none text-[13px]">
                 <span className="mr-2 font-mono text-[11px] text-slate-500">{id}</span>
                 {g.question}
@@ -114,7 +164,7 @@ export default function EvalPage() {
                 {[g, v].map((r) => (
                   <div key={r.system} className="rounded-md bg-black/30 p-3">
                     <div className={`text-[11px] uppercase tracking-wider ${r.system === "graph" ? "text-violet-300" : "text-pink-300"}`}>
-                      {r.system} · F1 {r.f1.toFixed(2)} · {r.tokens.toLocaleString()} tokens{r.verified ? ` · verified ${r.verified}` : ""}
+                      {r.system} · {r.model} · F1 {r.f1.toFixed(2)} · {r.tokens.toLocaleString()} tokens{r.verified ? ` · verified ${r.verified}` : ""}
                     </div>
                     {r.system === "graph" && <div className="mt-1 font-mono text-[10.5px] text-slate-500">{r.tools.join(" → ")}</div>}
                     <pre className="mt-2 whitespace-pre-wrap text-[12px] leading-relaxed text-slate-300">{r.answer}</pre>

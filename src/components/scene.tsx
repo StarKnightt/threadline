@@ -7,26 +7,17 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { labelOf, shortName } from "@/lib/agent/types";
 import { sceneData, type Lane } from "@/lib/client/trace-state";
+import { useTheme } from "@/lib/client/use-theme";
+import { NODE_COLORS, nodeVar, type Theme } from "@/lib/theme";
 
 export type ConstNode = { key: string; name: string; label: string; x: number; y: number; z: number; w: number };
 export type Constellation = { nodes: ConstNode[]; edges: { a: string; b: string; t: string }[] };
 
-export const COLORS: Record<string, string> = {
-  Repo: "#f8fafc",
-  Person: "#fbbf24",
-  PullRequest: "#a78bfa",
-  Issue: "#fb7185",
-  File: "#2dd4bf",
-  Directory: "#14b8a6",
-  Release: "#4ade80",
-  Concept: "#60a5fa",
-  Doc: "#cbd5e1",
-  Label: "#94a3b8",
-  Org: "#f8fafc",
-  Chunk: "#f472b6",
-  Entity: "#94a3b8",
-};
-const GOLD = "#ffd166";
+/** Per-theme stage: dark relies on HDR colours and bloom; light uses flat, saturated colours on a pale sweep. */
+const STAGE = {
+  dark: { bg: "#05060a", fog: [700, 2000], gold: "#ffd166", baseEdge: "#5b6b8c", edge: "#6d5bd0", edgeActive: "#c4b5fd", pulse: "#e9d5ff" },
+  light: { bg: "#eef1f7", fog: [900, 2400], gold: "#c99700", baseEdge: "#64748b", edge: "#a78bfa", edgeActive: "#6d28d9", pulse: "#5b21b6" },
+} as const;
 
 function hash(s: string) {
   let h = 2166136261;
@@ -87,26 +78,35 @@ function baseSize(n: ConstNode) {
   return 1.2 + Math.min(1.8, Math.log10(1 + n.w) * 0.6);
 }
 
-function BaseNodes({ nodes, dim }: { nodes: ConstNode[]; dim: boolean }) {
+const bgCol = new THREE.Color();
+
+/** Dark dims by darkening; light dims by fading toward the stage colour. */
+function shade(c: THREE.Color, theme: Theme, darkScale: number, lightFade: number) {
+  return theme === "dark" ? c.multiplyScalar(darkScale) : c.lerp(bgCol.set(STAGE.light.bg), lightFade);
+}
+
+function BaseNodes({ nodes, dim, theme }: { nodes: ConstNode[]; dim: boolean; theme: Theme }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   useLayoutEffect(() => {
     const m = ref.current;
     if (!m) return;
+    const P = NODE_COLORS[theme];
     nodes.forEach((n, i) => {
       tmp.position.set(n.x, n.y, n.z);
       tmp.scale.setScalar(baseSize(n) * (dim ? (n.label === "Repo" ? 0.45 : 0.6) : 1));
       tmp.updateMatrix();
       m.setMatrixAt(i, tmp.matrix);
-      col.set(COLORS[n.label] ?? "#888").multiplyScalar(dim ? (n.label === "Repo" ? 0.16 : 0.13) : n.label === "Repo" ? 0.9 : 0.5);
+      const repo = n.label === "Repo";
+      shade(col.set(P[n.label] ?? "#888"), theme, dim ? (repo ? 0.16 : 0.13) : repo ? 0.9 : 0.5, dim ? (repo ? 0.86 : 0.8) : repo ? 0.05 : 0.4);
       m.setColorAt(i, col);
     });
     m.instanceMatrix.needsUpdate = true;
     if (m.instanceColor) m.instanceColor.needsUpdate = true;
-  }, [nodes, dim]);
+  }, [nodes, dim, theme]);
   return <instancedMesh ref={ref} args={[sphere, undefined, nodes.length]} frustumCulled={false}><meshBasicMaterial toneMapped={false} /></instancedMesh>;
 }
 
-function BaseEdges({ c, pos, dim }: { c: Constellation; pos: Map<string, THREE.Vector3>; dim: boolean }) {
+function BaseEdges({ c, pos, dim, theme }: { c: Constellation; pos: Map<string, THREE.Vector3>; dim: boolean; theme: Theme }) {
   const geom = useMemo(() => {
     const arr: number[] = [];
     for (const e of c.edges) {
@@ -120,14 +120,14 @@ function BaseEdges({ c, pos, dim }: { c: Constellation; pos: Map<string, THREE.V
   }, [c, pos]);
   return (
     <lineSegments geometry={geom}>
-      <lineBasicMaterial color="#5b6b8c" transparent opacity={dim ? 0.05 : 0.12} depthWrite={false} />
+      <lineBasicMaterial color={STAGE[theme].baseEdge} transparent opacity={theme === "dark" ? (dim ? 0.05 : 0.12) : dim ? 0.07 : 0.16} depthWrite={false} />
     </lineSegments>
   );
 }
 
 type TraceNode = { key: string; step: number; p: THREE.Vector3; label: string; active: boolean; gold: boolean };
 
-function TraceNodes({ nodes, hovered, onHover, onPick }: { nodes: TraceNode[]; hovered: string | null; onHover: (k: string | null) => void; onPick: (k: string) => void }) {
+function TraceNodes({ nodes, hovered, onHover, onPick, theme }: { nodes: TraceNode[]; hovered: string | null; onHover: (k: string | null) => void; onPick: (k: string) => void; theme: Theme }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const born = useRef(new Map<string, number>());
   useFrame(({ clock }) => {
@@ -141,12 +141,13 @@ function TraceNodes({ nodes, hovered, onHover, onPick }: { nodes: TraceNode[]; h
       const pop = 1 + Math.sin(Math.min(1, age / 0.6) * Math.PI) * 0.8;
       const base = n.label === "Repo" ? 7.5 : n.label === "Person" ? 3 : 2.4;
       const breathe = n.active ? 1 + Math.sin(t * 3 + i) * 0.08 : 1;
-      const s = base * grow * pop * breathe * (hovered === n.key ? 1.6 : 1);
+      const s = base * grow * pop * breathe * (hovered === n.key ? 1.6 : 1) * (n.gold && theme === "light" ? 1.25 : 1);
       tmp.position.copy(n.p);
       tmp.scale.setScalar(Math.max(0.001, s));
       tmp.updateMatrix();
       m.setMatrixAt(i, tmp.matrix);
-      col.set(n.gold ? GOLD : COLORS[n.label] ?? "#fff").multiplyScalar(n.active || n.gold ? 2.6 : 1.25);
+      col.set(n.gold ? STAGE[theme].gold : NODE_COLORS[theme][n.label] ?? "#888");
+      shade(col, theme, n.active || n.gold ? 2.6 : 1.25, n.active || n.gold ? 0 : 0.18);
       m.setColorAt(i, col);
     });
     m.count = nodes.length;
@@ -173,7 +174,7 @@ function TraceNodes({ nodes, hovered, onHover, onPick }: { nodes: TraceNode[]; h
   );
 }
 
-function Pulse({ a, b, color, delay }: { a: THREE.Vector3; b: THREE.Vector3; color: string; delay: number }) {
+function Pulse({ a, b, color, delay, gain }: { a: THREE.Vector3; b: THREE.Vector3; color: string; delay: number; gain: number }) {
   const ref = useRef<THREE.Mesh>(null);
   const start = useRef<number | null>(null);
   useFrame(({ clock }) => {
@@ -190,12 +191,14 @@ function Pulse({ a, b, color, delay }: { a: THREE.Vector3; b: THREE.Vector3; col
   });
   return (
     <mesh ref={ref} geometry={sphere}>
-      <meshBasicMaterial color={new THREE.Color(color).multiplyScalar(4)} toneMapped={false} />
+      <meshBasicMaterial color={new THREE.Color(color).multiplyScalar(gain)} toneMapped={false} />
     </mesh>
   );
 }
 
-function TraceEdges({ edges, pos, activeStep }: { edges: ReturnType<typeof sceneData>["edges"]; pos: Map<string, THREE.Vector3>; activeStep: number }) {
+function TraceEdges({ edges, pos, activeStep, theme }: { edges: ReturnType<typeof sceneData>["edges"]; pos: Map<string, THREE.Vector3>; activeStep: number; theme: Theme }) {
+  const S = STAGE[theme];
+  const dark = theme === "dark";
   return (
     <>
       {edges.slice(0, 220).map(({ e, step, gold }, i) => {
@@ -203,11 +206,12 @@ function TraceEdges({ edges, pos, activeStep }: { edges: ReturnType<typeof scene
         const b = pos.get(e[2]);
         if (!a || !b) return null;
         const active = step === activeStep;
-        const color = gold ? GOLD : active ? "#c4b5fd" : "#6d5bd0";
+        const color = gold ? S.gold : active ? S.edgeActive : S.edge;
+        const gain = dark ? (gold ? 2.4 : active ? 1.8 : 0.9) : 1;
         return (
           <group key={`${e[0]}|${e[2]}|${gold}|${i}`}>
-            <Line points={[a, b]} color={new THREE.Color(color).multiplyScalar(gold ? 2.4 : active ? 1.8 : 0.9)} lineWidth={gold ? 3 : active ? 1.8 : 1} transparent opacity={gold || active ? 1 : 0.55} toneMapped={false} />
-            {(active || gold) && i < 160 && <Pulse a={a} b={b} color={gold ? GOLD : "#e9d5ff"} delay={(i % 12) * 0.09} />}
+            <Line points={[a, b]} color={new THREE.Color(color).multiplyScalar(gain)} lineWidth={gold ? (dark ? 3 : 3.6) : active ? 1.8 : 1} transparent opacity={gold || active ? 1 : dark ? 0.55 : 0.7} toneMapped={false} />
+            {(active || gold) && i < 160 && <Pulse a={a} b={b} color={gold ? (dark ? S.gold : "#9a7400") : S.pulse} gain={dark ? 4 : 1} delay={(i % 12) * 0.09} />}
           </group>
         );
       })}
@@ -278,6 +282,9 @@ export function Scene({
   onHover: (k: string | null) => void;
   onPick: (k: string) => void;
 }) {
+  const theme = useTheme();
+  const S = STAGE[theme];
+  const dark = theme === "dark";
   const c = constellation ?? { nodes: [], edges: [] };
   const base = useMemo(() => new Map(c.nodes.map((n) => [n.key, new THREE.Vector3(n.x, n.y, n.z)])), [c]);
   const data = useMemo(() => (lane ? sceneData(lane, upTo) : null), [lane, upTo]);
@@ -335,25 +342,31 @@ export function Scene({
   return (
     <div className="relative h-full w-full">
     <Canvas dpr={[1, 1.5]} camera={{ position: [0, 160, 720], fov: 45, near: 1, far: 5000 }} gl={{ antialias: true, powerPreference: "high-performance" }}>
-      <color attach="background" args={["#05060a"]} />
-      <fog attach="fog" args={["#05060a", 700, 2000]} />
-      <Stars radius={1400} depth={300} count={1600} factor={7} saturation={0} fade speed={0.25} />
-      <BaseNodes nodes={c.nodes} dim={!!lane && (traceNodes.length > 0 || chunkPoints.length > 0)} />
-      <BaseEdges c={c} pos={base} dim={!!lane} />
-      {data && !isVector && <TraceEdges edges={data.edges} pos={pos} activeStep={data.activeStep} />}
-      {!isVector && <TraceNodes nodes={traceNodes} hovered={hovered} onHover={onHover} onPick={onPick} />}
+      <color attach="background" args={[S.bg]} />
+      <fog attach="fog" args={[S.bg, S.fog[0], S.fog[1]]} />
+      {dark && <Stars radius={1400} depth={300} count={1600} factor={7} saturation={0} fade speed={0.25} />}
+      <BaseNodes nodes={c.nodes} dim={!!lane && (traceNodes.length > 0 || chunkPoints.length > 0)} theme={theme} />
+      <BaseEdges c={c} pos={base} dim={!!lane} theme={theme} />
+      {data && !isVector && <TraceEdges edges={data.edges} pos={pos} activeStep={data.activeStep} theme={theme} />}
+      {!isVector && <TraceNodes nodes={traceNodes} hovered={hovered} onHover={onHover} onPick={onPick} theme={theme} />}
       {isVector &&
         chunkPoints.map((cp) => (
           <mesh key={cp.key} position={cp.p} scale={1.4 + cp.score * 4} geometry={sphere} onClick={() => onPick(cp.owner)}>
-            <meshBasicMaterial color={new THREE.Color(COLORS.Chunk).multiplyScalar(1.4 + cp.score * 2)} toneMapped={false} />
+            <meshBasicMaterial color={dark ? new THREE.Color(NODE_COLORS.dark.Chunk).multiplyScalar(1.4 + cp.score * 2) : NODE_COLORS.light.Chunk} toneMapped={false} />
           </mesh>
         ))}
       <LabelProjector items={labelItems} refs={labelRefs} />
       <Rig focus={focus} idle={idle} />
-      <EffectComposer multisampling={0}>
-        <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={1.15} radius={0.7} />
-        <Vignette eskil={false} offset={0.2} darkness={0.75} />
-      </EffectComposer>
+      {dark ? (
+        <EffectComposer key="dark" multisampling={0}>
+          <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={1.15} radius={0.7} />
+          <Vignette eskil={false} offset={0.2} darkness={0.75} />
+        </EffectComposer>
+      ) : (
+        <EffectComposer key="light" multisampling={4}>
+          <Vignette eskil={false} offset={0.35} darkness={0.22} />
+        </EffectComposer>
+      )}
     </Canvas>
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {labelItems.map((it) => (
@@ -364,7 +377,7 @@ export function Scene({
               else labelRefs.current.delete(it.key);
             }}
             className={`tl-label absolute left-0 top-0 ${it.strong ? "tl-label-strong" : ""}`}
-            style={{ borderColor: COLORS[it.label] ?? "#888", opacity: 0 }}
+            style={{ borderColor: nodeVar(it.label), opacity: 0 }}
           >
             {it.text ?? shortName(it.key)}
           </div>

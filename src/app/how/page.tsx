@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Cypher } from "@/components/cypher";
-import { COLORS } from "@/components/scene";
+import { nodeVar } from "@/lib/theme";
 import { Q } from "@/lib/cypher/catalogue";
 import { DERIVED, INDEXES } from "@/lib/cypher/schema";
 import { MEM_Q } from "@/lib/memory";
@@ -73,7 +74,10 @@ export default function HowPage() {
   );
   return (
     <main className="mx-auto max-w-5xl px-6 py-10 text-slate-300">
-      <Link href="/" className="text-[12px] text-slate-500 hover:text-white">← Threadline</Link>
+      <div className="flex items-center gap-3">
+        <Link href="/" className="text-[12px] text-slate-500 hover:text-white">← Threadline</Link>
+        <ThemeToggle className="ml-auto" />
+      </div>
       <h1 className="mt-3 text-2xl font-semibold tracking-tight text-white">How Threadline works</h1>
       <p className="mt-3 max-w-3xl text-[14px] leading-relaxed">
         FalkorDB is the only database. It holds the company brain (one graph), each visitor&apos;s memory (one graph per visitor), the shared blackboard where the Investigator and Verifier agents coordinate, the stored traces that replay runs, the vector index used by both the agent and the baseline, the rate-limit counters, and even the 3D layout. Take FalkorDB out and nothing is left.
@@ -94,11 +98,11 @@ export default function HowPage() {
       <h2 className="mt-10 text-lg font-semibold text-white">Graph data model</h2>
       <div className="mt-3 overflow-x-auto rounded-lg border border-white/[0.06]">
         <table className="w-full text-left text-[12.5px]">
-          <thead className="bg-white/[0.03] text-slate-400"><tr><th className="p-2.5">Label (all brain nodes also carry :Entity)</th><th className="p-2.5">Key</th><th className="p-2.5">Properties</th></tr></thead>
+          <thead className="bg-surface text-slate-400"><tr><th className="p-2.5">Label (all brain nodes also carry :Entity)</th><th className="p-2.5">Key</th><th className="p-2.5">Properties</th></tr></thead>
           <tbody>
             {NODES.map(([l, k, p]) => (
               <tr key={l} className="border-t border-white/[0.05]">
-                <td className="p-2.5"><span className="mr-2 inline-block h-2 w-2 rounded-full" style={{ background: COLORS[l.split(" ")[0]] ?? "#94a3b8" }} />{l}</td>
+                <td className="p-2.5"><span className="mr-2 inline-block h-2 w-2 rounded-full" style={{ background: nodeVar(l.split(" ")[0]) }} />{l}</td>
                 <td className="p-2.5 font-mono text-[11px] text-slate-400">{k}</td>
                 <td className="p-2.5 text-slate-400">{p}</td>
               </tr>
@@ -108,7 +112,7 @@ export default function HowPage() {
       </div>
       <div className="mt-4 overflow-x-auto rounded-lg border border-white/[0.06]">
         <table className="w-full text-left text-[12.5px]">
-          <thead className="bg-white/[0.03] text-slate-400"><tr><th className="p-2.5">Relationship</th><th className="p-2.5">Between</th></tr></thead>
+          <thead className="bg-surface text-slate-400"><tr><th className="p-2.5">Relationship</th><th className="p-2.5">Between</th></tr></thead>
           <tbody>
             {RELS.map(([r, b]) => (
               <tr key={r} className="border-t border-white/[0.05]"><td className="p-2.5 font-mono text-[11px] text-slate-200">{r}</td><td className="p-2.5 text-slate-400">{b}</td></tr>

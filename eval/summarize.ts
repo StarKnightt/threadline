@@ -4,10 +4,13 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 type R = { id: string; category: string; system: "graph" | "vector"; model: string; f1: number; precision: number; recall: number; exact: boolean; tokens: number; ms: number; steps: number; verified: string | null };
 const rows = readFileSync("eval/results.jsonl", "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l) as R);
-const model = process.argv[2] ?? rows[0]?.model;
-const use = rows.filter((r) => r.model === model);
-const both = new Set([...new Set(use.map((r) => r.id))].filter((id) => { const g = use.find((r) => r.id === id && r.system === "graph"); const v = use.find((r) => r.id === id && r.system === "vector"); return g && v && g.model === v.model; }));
-const paired = use.filter((r) => both.has(r.id));
+// Default: every model in the rotation. Pass a model id to summarise one model alone.
+const only = process.argv[2];
+const use = only ? rows.filter((r) => r.model === only) : rows;
+const pairKey = (r: R) => `${r.id}|${r.model}`;
+const both = new Set([...new Set(use.map(pairKey))].filter((k) => use.some((r) => pairKey(r) === k && r.system === "graph") && use.some((r) => pairKey(r) === k && r.system === "vector")));
+const paired = use.filter((r) => both.has(pairKey(r)));
+const model = only ?? [...new Set(paired.map((r) => r.model))].join(", ");
 
 const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
 const pct = (xs: number[], p: number) => {
@@ -37,6 +40,7 @@ const summary = {
   model,
   generatedAt: new Date().toISOString(),
   pairedQuestions: both.size,
+  totalQuestions: 60,
   overall: { graph: stats(paired.filter((r) => r.system === "graph")), vector: stats(paired.filter((r) => r.system === "vector")) },
   models: Object.fromEntries([...new Set(paired.map((r) => r.model))].map((m) => [m, { graph: stats(paired.filter((r) => r.model === m && r.system === "graph")), vector: stats(paired.filter((r) => r.model === m && r.system === "vector")) }])),
   categories: Object.fromEntries(

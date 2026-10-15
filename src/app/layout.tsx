@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NODE_CSS, THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -16,8 +17,12 @@ export const viewport: Viewport = { themeColor: "#05060a" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full bg-[#05060a]">{children}</body>
+    <html lang="en" data-theme="dark" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <style dangerouslySetInnerHTML={{ __html: NODE_CSS }} />
+      </head>
+      <body className="min-h-full bg-canvas">{children}</body>
     </html>
   );
 }

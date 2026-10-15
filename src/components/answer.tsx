@@ -3,7 +3,7 @@
 import { Fragment } from "react";
 import { labelOf, shortName, type Citation } from "@/lib/agent/types";
 import { githubUrl } from "@/lib/client/trace-state";
-import { COLORS } from "./scene";
+import { nodeVar } from "@/lib/theme";
 
 const KEY_SPLIT = /[\[【]?\b((?:pr|issue|person|file|dir|release|doc|concept|repo|label):[^\s\]\[;,()【】「」'"*]+?)[\]】]?(?=[\s.,;)\]【】*]|$)/g;
 
@@ -12,9 +12,9 @@ export function KeyChip({ k, status, onHover }: { k: string; status?: "ok" | "re
   const label = labelOf(k);
   const inner = (
     <>
-      <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: COLORS[label] ?? "#888" }} />
+      <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: nodeVar(label) }} />
       <span className="truncate">{shortName(k)}</span>
-      {status === "ok" && <span className="text-[#ffd166]" title="Verified: observed in a tool result and connected to the question by a graph path">✓</span>}
+      {status === "ok" && <span className="text-gold" title="Verified: observed in a tool result and connected to the question by a graph path">✓</span>}
       {status === "rejected" && <span className="text-rose-400" title="Rejected by the verifier">✕</span>}
     </>
   );
@@ -81,7 +81,7 @@ export function GroundedBadge({ citations, handoff }: { citations: Citation[]; h
   return (
     <span className="flex flex-wrap items-center gap-2">
       <span
-        className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${all ? "border-[#ffd166]/50 bg-[#ffd166]/10 text-[#ffd166]" : ok ? "border-amber-400/40 bg-amber-400/10 text-amber-300" : "border-rose-400/40 bg-rose-400/10 text-rose-300"}`}
+        className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${all ? "border-gold/50 bg-gold/10 text-gold" : ok ? "border-amber-400/40 bg-amber-400/10 text-amber-300" : "border-rose-400/40 bg-rose-400/10 text-rose-300"}`}
         title="Each cited node must appear in a tool result and be reachable from the question's entry nodes within 4 hops"
       >
         {ok} of {citations.length} citations verified by graph path

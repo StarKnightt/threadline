@@ -7,8 +7,9 @@ import type { Trace, TraceStep } from "@/lib/agent/types";
 import { emptyLane, laneFromTrace, reduce, type Lane } from "@/lib/client/trace-state";
 import { Answer, GroundedBadge, KeyChip } from "./answer";
 import { Cypher } from "./cypher";
+import { ThemeToggle } from "./theme-toggle";
 import type { Constellation } from "./scene";
-import { COLORS } from "./scene";
+import { nodeVar } from "@/lib/theme";
 
 const Scene = dynamic(() => import("./scene").then((m) => m.Scene), { ssr: false, loading: () => <div className="grid h-full place-items-center text-xs text-slate-500">Loading the graph…</div> });
 
@@ -46,9 +47,9 @@ function StepCard({ s, active, onClick }: { s: TraceStep; active: boolean; onCli
   const verifier = s.agent === "verifier";
   const args = Object.entries(s.args).filter(([, v]) => v !== undefined && v !== null && !(Array.isArray(v) && !v.length));
   return (
-    <div className={`rounded-lg border p-3 transition ${verifier ? "border-[#ffd166]/30 bg-[#ffd166]/[0.04]" : active ? "border-violet-400/40 bg-violet-400/[0.06]" : "border-white/[0.06] bg-white/[0.02] hover:border-white/15"}`}>
+    <div className={`tl-in rounded-lg border p-3 transition-colors ${verifier ? "border-gold/30 bg-gold/[0.04]" : active ? "border-violet-400/40 bg-violet-400/[0.06]" : "border-white/[0.06] bg-surface hover:border-white/15"}`}>
       <button onClick={onClick} className="flex w-full items-baseline gap-2 text-left">
-        <span className={`font-mono text-[11px] ${verifier ? "text-[#ffd166]" : "text-violet-300"}`}>{String(s.step).padStart(2, "0")}</span>
+        <span className={`font-mono text-[11px] ${verifier ? "text-gold" : "text-violet-300"}`}>{String(s.step).padStart(2, "0")}</span>
         <span className="text-[13px] font-medium text-slate-100">{TOOL_NAMES[s.tool] ?? s.tool}</span>
         <span className="ml-auto shrink-0 font-mono text-[10.5px] text-slate-500">
           {s.queries.length} quer{s.queries.length === 1 ? "y" : "ies"} · {s.ms} ms · {s.rows.length} rows
@@ -64,10 +65,10 @@ function StepCard({ s, active, onClick }: { s: TraceStep; active: boolean; onCli
           ))}
         </div>
       )}
-      {s.note && <div className={`mt-1.5 text-[11.5px] ${verifier ? "text-[#ffd166]/90" : "text-slate-400"}`}>{s.note}</div>}
+      {s.note && <div className={`mt-1.5 text-[11.5px] ${verifier ? "text-gold" : "text-slate-400"}`}>{s.note}</div>}
       {typeof s.rows[0]?.draft === "string" && (
         <div className="mt-2 rounded-md border border-emerald-400/20 bg-emerald-400/[0.04] p-2.5">
-          <div className="mb-1 flex items-center text-[10.5px] uppercase tracking-wider text-emerald-300/80">
+          <div className="mb-1 flex items-center text-[10.5px] uppercase tracking-wider text-emerald-300">
             Triage draft (not posted)
             <button onClick={() => navigator.clipboard.writeText(s.rows[0].draft as string)} className="ml-auto normal-case tracking-normal text-emerald-300 hover:text-white">Copy</button>
           </div>
@@ -232,23 +233,24 @@ export function Theatre({ traceId }: { traceId?: string }) {
   const hops = useMemo(() => new Set(graph?.steps.flatMap((s) => s.edges.map((e) => `${e[0]}|${e[2]}`)) ?? []).size, [graph]);
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-[#05060a] text-slate-200 lg:flex-row">
+    <div className="flex h-dvh flex-col overflow-hidden bg-canvas text-slate-200 lg:flex-row">
       <aside className="order-2 flex min-h-0 flex-1 flex-col border-white/[0.06] lg:order-1 lg:w-[460px] lg:flex-none lg:border-r">
         <header className="border-b border-white/[0.06] px-5 pb-3 pt-4">
           <div className="flex items-center gap-2">
             <Link href="/" onClick={() => { setGraph(null); setVector(null); setAsked(""); }} className="flex items-center gap-2">
               <span className="relative h-5 w-5">
-                <span className="absolute left-0 top-2 h-1 w-5 rounded-full bg-gradient-to-r from-amber-300 via-violet-400 to-[#ffd166]" />
+                <span className="absolute left-0 top-2 h-1 w-5 rounded-full bg-gradient-to-r from-amber-300 via-violet-400 to-gold" />
                 <span className="absolute left-0 top-0.5 h-1.5 w-1.5 rounded-full bg-amber-300" />
-                <span className="absolute right-0 top-3 h-1.5 w-1.5 rounded-full bg-[#ffd166]" />
+                <span className="absolute right-0 top-3 h-1.5 w-1.5 rounded-full bg-gold" />
               </span>
               <span className="text-[15px] font-semibold tracking-tight text-white">Threadline</span>
             </Link>
-            <nav className="ml-auto flex gap-3 text-[12px] text-slate-400">
+            <nav className="ml-auto flex items-center gap-3 text-[12px] text-slate-400">
               <Link href="/eval" className="hover:text-white">Eval</Link>
               <Link href="/how" className="hover:text-white">How it works</Link>
               <a href="https://github.com/StarKnightt/threadline" target="_blank" rel="noreferrer" className="hover:text-white">GitHub</a>
             </nav>
+            <ThemeToggle className="ml-1" />
           </div>
           <p className="mt-1.5 text-[12px] leading-snug text-slate-400">
             A company brain built from the public GitHub history of the FalkorDB organisation. Every answer walks a FalkorDB graph, and every hop is shown with its Cypher.
@@ -279,14 +281,14 @@ export function Theatre({ traceId }: { traceId?: string }) {
               rows={2}
               maxLength={400}
               placeholder="Who should review a change to the vector index code?"
-              className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[13.5px] text-slate-100 outline-none placeholder:text-slate-600 focus:border-violet-400/50"
+              className="w-full resize-none rounded-lg border border-white/10 bg-surface px-3 py-2 text-[13.5px] text-slate-100 outline-none placeholder:text-slate-600 focus:border-violet-400/50"
             />
             <div className="mt-2 flex items-center gap-2">
               <div className="flex rounded-md border border-white/10 p-0.5 text-[11.5px]">
-                <button type="button" onClick={() => setSplit(false)} className={`rounded px-2 py-1 ${!split ? "bg-white/10 text-white" : "text-slate-400"}`}>Graph agent</button>
-                <button type="button" onClick={() => setSplit(true)} className={`rounded px-2 py-1 ${split ? "bg-white/10 text-white" : "text-slate-400"}`}>Graph vs vector RAG</button>
+                <button type="button" onClick={() => setSplit(false)} className={`tl-press rounded px-2 py-1 ${!split ? "bg-white/10 text-white" : "text-slate-400"}`}>Graph agent</button>
+                <button type="button" onClick={() => setSplit(true)} className={`tl-press rounded px-2 py-1 ${split ? "bg-white/10 text-white" : "text-slate-400"}`}>Graph vs vector RAG</button>
               </div>
-              <button disabled={busy || question.trim().length < 6} className="ml-auto rounded-md bg-violet-500 px-3 py-1.5 text-[12.5px] font-medium text-white transition hover:bg-violet-400 disabled:opacity-40">
+              <button disabled={busy || question.trim().length < 6} className="ml-auto rounded-md tl-press bg-accent px-3 py-1.5 text-[12.5px] font-medium text-on-accent hover:bg-accent-hover disabled:opacity-40">
                 {busy ? "Walking the graph…" : "Ask"}
               </button>
             </div>
@@ -296,7 +298,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
               <div className="mb-1.5 text-[10.5px] uppercase tracking-wider text-slate-500">Recorded runs (replay from FalkorDB, no LLM call)</div>
               <div className="flex flex-col gap-1">
                 {showcase.map((s) => (
-                  <button key={s.id} onClick={() => openTrace(s.id)} className="truncate rounded-md border border-white/[0.06] px-2.5 py-1.5 text-left text-[12px] text-slate-300 transition hover:border-violet-400/40 hover:text-white">
+                  <button key={s.id} onClick={() => openTrace(s.id)} className="tl-press truncate rounded-md border border-white/[0.06] bg-surface px-2.5 py-1.5 text-left text-[12px] text-slate-300 hover:border-violet-400/40 hover:text-white">
                     {s.question}
                   </button>
                 ))}
@@ -311,8 +313,8 @@ export function Theatre({ traceId }: { traceId?: string }) {
             <>
               {vector && graph && (
                 <div className="mb-3 flex rounded-md border border-white/10 p-0.5 text-[11.5px]">
-                  <button onClick={() => setTab("graph")} className={`flex-1 rounded px-2 py-1 ${tab === "graph" ? "bg-white/10 text-white" : "text-slate-400"}`}>Graph agent</button>
-                  <button onClick={() => setTab("vector")} className={`flex-1 rounded px-2 py-1 ${tab === "vector" ? "bg-white/10 text-white" : "text-slate-400"}`}>Vector RAG baseline</button>
+                  <button onClick={() => setTab("graph")} className={`tl-press flex-1 rounded px-2 py-1 ${tab === "graph" ? "bg-white/10 text-white" : "text-slate-400"}`}>Graph agent</button>
+                  <button onClick={() => setTab("vector")} className={`tl-press flex-1 rounded px-2 py-1 ${tab === "vector" ? "bg-white/10 text-white" : "text-slate-400"}`}>Vector RAG baseline</button>
                 </div>
               )}
               <div className="mb-3 text-[13px] font-medium text-white">{asked}</div>
@@ -343,7 +345,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
                 )}
               </div>
               {answerVisible && lane?.answer && (
-                <div className="mt-4 rounded-lg border border-white/[0.08] bg-white/[0.025] p-4">
+                <div className="tl-in mt-4 rounded-lg border border-white/[0.08] bg-surface p-4">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <span className="text-[11px] uppercase tracking-wider text-slate-500">{lane.mode === "graph" ? "Answer" : "Vector RAG answer"}</span>
                     {lane.mode === "graph" ? <GroundedBadge citations={lane.citations} handoff={lane.handoff} /> : <span className="rounded-full border border-white/10 px-2 py-0.5 text-[11px] text-slate-400">no path check possible: chunks are not connected</span>}
@@ -387,7 +389,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
                   await fetch(`/api/memory?userId=${ids().userId}`, { method: "DELETE" });
                   loadMemory();
                 }}
-                className="text-rose-300/80 hover:text-rose-200"
+                className="text-rose-300 hover:text-rose-200"
               >
                 Forget everything
               </button>
@@ -401,7 +403,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
           {split && vector && (
             <div className="relative border-r border-white/[0.06]">
               <div className="pointer-events-none absolute left-4 top-3 z-10">
-                <div className="text-[11px] uppercase tracking-wider text-pink-300/80">Vector RAG</div>
+                <div className="text-[11px] uppercase tracking-wider text-pink-300">Vector RAG</div>
                 <div className="text-[12px] text-slate-400">{vector.chunks?.length ?? 0} retrieved chunks, no connections between them</div>
               </div>
               <Scene constellation={constellation} lane={vector} upTo={live ? vector.steps.length : vp.upTo} hovered={hovered} onHover={setHovered} onPick={() => {}} />
@@ -410,7 +412,7 @@ export function Theatre({ traceId }: { traceId?: string }) {
           <div className="relative">
             {split && vector && (
               <div className="pointer-events-none absolute left-4 top-3 z-10">
-                <div className="text-[11px] uppercase tracking-wider text-violet-300/80">Graph agent</div>
+                <div className="text-[11px] uppercase tracking-wider text-violet-300">Graph agent</div>
                 <div className="text-[12px] text-slate-400">{graph?.steps.filter((s) => s.agent !== "verifier").length ?? 0} tool calls, {hops} traversed edges</div>
               </div>
             )}
@@ -427,12 +429,12 @@ export function Theatre({ traceId }: { traceId?: string }) {
         <div className="pointer-events-none absolute bottom-3 left-4 z-10 hidden flex-wrap gap-x-3 gap-y-1 text-[10.5px] text-slate-400 md:flex">
           {["Repo", "Person", "PullRequest", "Issue", "Directory", "File", "Release", "Concept", "Doc"].map((l) => (
             <span key={l} className="flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full" style={{ background: COLORS[l] }} />
+              <span className="h-2 w-2 rounded-full" style={{ background: nodeVar(l) }} />
               {l === "PullRequest" ? "Pull request" : l}
             </span>
           ))}
           <span className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-[#ffd166]" />
+            <span className="h-2 w-2 rounded-full bg-gold" />
             Verified path
           </span>
         </div>
@@ -444,7 +446,9 @@ export function Theatre({ traceId }: { traceId?: string }) {
             </button>
             <div className="flex gap-1">
               {graph.steps.map((s) => (
-                <button key={s.step} onClick={() => gp.setUpTo(s.step)} title={TOOL_NAMES[s.tool] ?? s.tool} className={`h-2 w-2 rounded-full transition ${s.step <= gp.upTo ? (s.agent === "verifier" ? "bg-[#ffd166]" : "bg-violet-400") : "bg-white/15"}`} />
+                <button key={s.step} onClick={() => gp.setUpTo(s.step)} title={TOOL_NAMES[s.tool] ?? s.tool} aria-label={`Show up to step ${s.step}: ${TOOL_NAMES[s.tool] ?? s.tool}`} className="tl-press -m-1 grid h-4 w-4 place-items-center rounded-full">
+                  <span className={`h-2 w-2 rounded-full transition-colors ${s.step <= gp.upTo ? (s.agent === "verifier" ? "bg-gold" : "bg-violet-400") : "bg-white/15"}`} />
+                </button>
               ))}
             </div>
           </div>
