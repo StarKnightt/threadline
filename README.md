@@ -3,7 +3,7 @@
 **A company brain that shows its work.** Threadline loads the public GitHub history of the FalkorDB organisation (six repositories plus the docs) into a FalkorDB graph of people, pull requests, issues, reviews, files, releases, docs and concepts. Ask "who should review a change to the vector index code?" and an agent walks the graph to answer. Every hop is replayed in 3D with the exact Cypher it ran, and a verifier checks that each cited node is really connected to the question before the answer gets a gold badge.
 
 - **Live:** https://threadline-graph.vercel.app
-- **Demo video:** _link added at submission_
+- **Demo video:** https://vimeo.com/1236637540
 - **Blog post:** _link added at submission_
 - **Tracks entered:** Company Brain (primary), Agents That Act on Connected Data, Agent Memory and Coordination
 - Built for [WeMakeDevs Graph Hacks](https://www.wemakedevs.org/hackathons/falkordb), 15 to 18 October 2026.

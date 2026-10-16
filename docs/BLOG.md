@@ -2,7 +2,7 @@
 title: "A company brain that shows its work: multi-hop GraphRAG on FalkorDB, with every hop replayed in 3D"
 published: false
 description: "Threadline turns six FalkorDB repositories into a FalkorDB graph, answers ownership and decision questions by walking it, checks its own citations with path queries, and scores 0.81 F1 against 0.12 for vector RAG on 60 questions."
-tags: falkordb, graphrag, ai, opensource
+tags: falkordb, graphrag, ai, webdev
 cover_image: https://raw.githubusercontent.com/StarKnightt/threadline/main/shots/02-split-graph-vs-vector.png
 ---
 
@@ -12,7 +12,9 @@ For [WeMakeDevs Graph Hacks](https://www.wemakedevs.org/hackathons/falkordb) I b
 
 - **Live app:** https://threadline-graph.vercel.app (six recorded runs replay instantly with no model call)
 - **Code (MIT):** https://github.com/StarKnightt/threadline
-- **Demo video:** VIDEO_URL
+- **Demo video:** https://vimeo.com/1236637540
+
+{% vimeo 1236637540 %}
 
 ![Graph agent versus vector RAG on the same question. Left: eight retrieved chunks with no connections between them. Right: the graph path from the vector-index concept to the PRs that mention it and the people who wrote and reviewed them, with the verified path in gold.](https://raw.githubusercontent.com/StarKnightt/threadline/main/shots/02-split-graph-vs-vector.png)
 
@@ -219,4 +221,4 @@ I planned the concept, graph model, query catalogue and evaluation method before
 - Source code and setup: https://github.com/StarKnightt/threadline
 - Cypher catalogue: https://github.com/StarKnightt/threadline/blob/main/docs/CYPHER.md
 - Evaluation data: https://github.com/StarKnightt/threadline/tree/main/eval
-- Demo video: VIDEO_URL
+- Demo video: https://vimeo.com/1236637540
