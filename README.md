@@ -4,7 +4,7 @@
 
 - **Live:** https://threadline-graph.vercel.app
 - **Demo video:** https://vimeo.com/1236637540
-- **Blog post:** _link added at submission_
+- **Blog post:** https://dev.to/starknight/a-company-brain-that-shows-its-work-multi-hop-graphrag-on-falkordb-with-every-hop-replayed-in-3d-141f
 - **Tracks entered:** Company Brain (primary), Agents That Act on Connected Data, Agent Memory and Coordination
 - Built for [WeMakeDevs Graph Hacks](https://www.wemakedevs.org/hackathons/falkordb), 15 to 18 October 2026.
 

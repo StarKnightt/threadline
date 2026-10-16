@@ -1,6 +1,6 @@
 ---
 title: "A company brain that shows its work: multi-hop GraphRAG on FalkorDB, with every hop replayed in 3D"
-published: false
+published: true
 description: "Threadline turns six FalkorDB repositories into a FalkorDB graph, answers ownership and decision questions by walking it, checks its own citations with path queries, and scores 0.81 F1 against 0.12 for vector RAG on 60 questions."
 tags: falkordb, graphrag, ai, webdev
 cover_image: https://raw.githubusercontent.com/StarKnightt/threadline/main/shots/02-split-graph-vs-vector.png
@@ -222,3 +222,4 @@ I planned the concept, graph model, query catalogue and evaluation method before
 - Cypher catalogue: https://github.com/StarKnightt/threadline/blob/main/docs/CYPHER.md
 - Evaluation data: https://github.com/StarKnightt/threadline/tree/main/eval
 - Demo video: https://vimeo.com/1236637540
+- Published on DEV: https://dev.to/starknight/a-company-brain-that-shows-its-work-multi-hop-graphrag-on-falkordb-with-every-hop-replayed-in-3d-141f
